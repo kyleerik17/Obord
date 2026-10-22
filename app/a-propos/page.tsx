@@ -36,7 +36,7 @@ export default function AboutPage() {
         </section>
 
         <section className="trust-team" aria-labelledby="team-title">
-          <div className="trust-section-heading"><p className="eyebrow eyebrow-dark">LES PERSONNES DERRIÈRE LE COLLECTIF</p><h2 id="team-title">L’équipe O’BORD</h2><p>Les portraits seront ajoutés lorsque les photos réelles seront disponibles.</p></div>
+          <div className="trust-section-heading"><p className="eyebrow eyebrow-dark">LES PERSONNES DERRIÈRE LE COLLECTIF</p><h2 id="team-title">L’équipe O’BORD</h2><p>Voici les organisateurs du collectif.</p></div>
           <div className="trust-grid trust-grid-three">
             {organizers.map((person) => (
               <article className="trust-card trust-person" key={person.name}>

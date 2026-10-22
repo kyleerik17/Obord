@@ -36,9 +36,10 @@ export type UpcomingEventsResult = {
 
 export const organizers: Organizer[] = [
   {
-    name: 'Malick Mockey',
+    name: 'Malick',
     role: 'Organisateur',
     initials: 'MM',
+    photo: '/malick.jpeg',
   },
   {
     name: 'Ange Erik',
@@ -47,7 +48,7 @@ export const organizers: Organizer[] = [
     photo: '/ange-erik.jpeg',
   },
   {
-    name: 'Aurore Niava',
+    name: 'Aurore',
     role: 'Organisatrice',
     initials: 'A',
   },

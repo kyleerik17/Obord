@@ -6,10 +6,10 @@ import { pageMetadata } from '@/lib/metadata'
 export const metadata = pageMetadata('La maison du chill', 'Le collectif O’BORD à Grand-Bassam : jeux, rencontres et sorties conviviales.')
 
 const games = [
-  { number: '01', title: 'La Table', tag: 'JEUX & CONVERSATIONS', text: 'Jeux de cartes, jeux de société et jeux de groupe : les règles servent surtout à lancer la conversation.', action: 'Je découvre les jeux', icon: '✳', color: 'lilac', shape: 'board' },
-  { number: '02', title: 'Le Salon', tag: 'DISCUSSIONS & RENCONTRES', text: 'Un endroit pour échanger, faire connaissance et laisser la conversation prendre son chemin.', action: 'Je viens papoter', icon: '✦', color: 'coral', shape: 'dice' },
-  { number: '03', title: 'Le Terrain', tag: 'ACTIVITÉ & MOUVEMENT', text: 'Des activités dynamiques et des défis à partager, toujours avec le plaisir d’être ensemble.', action: 'Je relève le défi', icon: '◈', color: 'yellow', shape: 'wood' },
-  { number: '04', title: 'Le Feu & la Plage', tag: 'PLEIN AIR & LÂCHER-PRISE', text: 'Musique, discussions, quelque chose à manger et à boire : on profite du bord de mer ensemble.', action: 'Je file au grand air', icon: '⌘', color: 'blue', shape: 'escape' },
+  { number: '01', title: 'La Table', tag: 'JEUX & CONVERSATIONS', text: 'Jeux de cartes, jeux de société et jeux de groupe : les règles servent surtout à lancer la conversation.', action: 'Rejoindre la table', icon: '✳', color: 'lilac', shape: 'board' },
+  { number: '02', title: 'Le Salon', tag: 'DISCUSSIONS & RENCONTRES', text: 'Un endroit pour échanger, faire connaissance et laisser la conversation prendre son chemin.', action: 'Faire connaissance', icon: '✦', color: 'coral', shape: 'dice' },
+  { number: '03', title: 'Le Terrain', tag: 'ACTIVITÉ & MOUVEMENT', text: 'Des activités dynamiques et des défis à partager, toujours avec le plaisir d’être ensemble.', action: 'Relever le défi', icon: '◈', color: 'yellow', shape: 'wood' },
+  { number: '04', title: 'Le Feu & la Plage', tag: 'PLEIN AIR & LÂCHER-PRISE', text: 'Musique, discussions, quelque chose à manger et à boire : on profite du bord de mer ensemble.', action: 'Profiter du moment', icon: '⌘', color: 'blue', shape: 'escape' },
 ]
 
 const stats = [
@@ -59,7 +59,7 @@ export default async function Home() {
           <h1>Et si ce soir,<br />on faisait<br /><span className="hero-last">connaissance<span className="hero-period">?</span></span></h1>
           <div className="hero-bottom">
             <div><span className="hero-tag">L’ACTIVITÉ EST LE PRÉTEXTE <span>✳</span></span><p>Viens comme tu es. Tu peux jouer, discuter,<br />ou simplement voir où le moment te mène.</p></div>
-            <div className="hero-actions"><Link href="#ateliers" data-no-progress="true" className="button-primary group">Allez, je découvre <Arrow diagonal /></Link><Link href="/soirees" className="button-quiet">Voir les dates <Arrow /></Link></div>
+            <div className="hero-actions"><Link href="#ateliers" data-no-progress="true" className="button-primary group">Découvrir O&apos;BORD <Arrow diagonal /></Link><Link href="/soirees" className="button-quiet">Voir les prochaines dates <Arrow /></Link></div>
           </div>
         </div>
         <div className="hero-art" aria-hidden="true"><div className="hero-orbit orbit-one" /><div className="hero-orbit orbit-two" /><div className="hero-disc"><Image src="/obord-logo.png" alt="" fill sizes="(max-width: 640px) 180px, 360px" priority /></div><div className="hero-star hero-star-one">✳</div><div className="hero-star hero-star-two">✦</div><div className="hero-star hero-star-three">✳</div><div className="hero-caption">LA MAISON DU CHILL <span>·</span> GRAND-BASSAM</div></div>

@@ -101,7 +101,7 @@ button:active, .button-primary:active, a.is-activating { transform: scale(.96); 
 .soirees-event-card:hover .soirees-event-head::after { transform: scale(1.12) rotate(12deg); }
 .soirees-event-number { margin-bottom: 12px; color: var(--accent); font-family: var(--font-space), sans-serif; font-size: 15px; font-weight: 700; letter-spacing: .03em; }.soirees-event-number span { margin-left: 5px; color: #aaa5ba; font-family: var(--font-inter), sans-serif; font-size: 8px; letter-spacing: .14em; }
 .soirees-event-head h2 { position: relative; z-index: 1; margin: 0; font-family: var(--font-space), sans-serif; font-size: clamp(23px, 4vw, 35px); letter-spacing: -.055em; }
-.soirees-event-meta { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }.soirees-event-meta span { padding: 6px 9px; border: 1px solid #ffffff24; border-radius: 999px; color: #d0ccda; font-size: 9px; }
+.soirees-event-meta { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }.soirees-event-meta span { padding: 6px 9px; border: 1px solid #ffffff24; border-radius: 999px; background: #fff; color: #1e1b29; font-size: 9px; }
 .soirees-event-body { padding: 24px 27px 28px; }.soirees-event-description { max-width: 730px; margin: 0 0 19px; color: #4a464a; font-size: 13px; line-height: 1.85; font-weight: 500; }
 .soirees-program-title { margin: 0 0 14px; color: #282438; font-family: var(--font-space), sans-serif; font-size: 20px; letter-spacing: -.04em; }.soirees-program-title span { color: var(--secondary); }
 .soirees-program-pending { display: flex; align-items: flex-start; gap: 11px; margin: 0 0 19px; padding: 15px 18px; border: 2px dashed #d9d1f2; border-radius: 12px; background: linear-gradient(135deg, #faf9fe 0%, #f3f0ff 100%); color: #4a464a; animation: rise 0.5s ease both; transition: border-color 0.3s ease, background 0.3s ease; }
@@ -130,7 +130,7 @@ body:has(.ob-home) nav[aria-label="Navigation principale"] > div > div { height:
 body:has(.ob-home) nav[aria-label="Navigation principale"] a { color: #f8f5ff; }
 body:has(.ob-home) nav[aria-label="Navigation principale"] .nav-brand { display: inline-flex; align-items: center; gap: 10px; }
 body:has(.ob-home) nav[aria-label="Navigation principale"] .nav-brand-logo { width: 40px; height: 40px; border: 1px solid #00a7d3; border-radius: 50%; object-fit: cover; }
-body:has(.ob-home) nav[aria-label="Navigation principale"] .nav-brand span { color: white; font-family: var(--font-space), sans-serif; font-size: 23px; font-weight: 700; letter-spacing: -.06em; }
+body:has(.ob-home) nav[aria-label="Navigation principale"] .nav-brand span { display: none; }
 body:has(.ob-home) nav[aria-label="Navigation principale"] > div > div > div a:not(:last-child) { position: relative; font-size: 12px; }
 body:has(.ob-home) nav[aria-label="Navigation principale"] > div > div > div a:not(:last-child)::after { position: absolute; right: 0; bottom: -7px; left: 0; height: 2px; background: var(--accent); content: ""; transform: scaleX(0); transform-origin: left; transition: transform .2s ease; }
 body:has(.ob-home) nav[aria-label="Navigation principale"] > div > div > div a:not(:last-child):hover::after { transform: scaleX(1); }
@@ -642,6 +642,18 @@ body:has(.ob-home) .site-footer-bottom { border-color: #ffffff1b; color: #817b8d
 .soirees-program-copy h4 { color: #282438; font-family: var(--font-display); font-size: 17px; font-weight: 700; }
 .soirees-program-copy > div > span { color: #514d5e; font-weight: 700; }
 .soirees-program-copy > p { color: #514d5e; font-size: 13px; line-height: 1.7; }
+
+/* Keep all event details readable against the light card surfaces. */
+.soirees-event-description,
+.soirees-event-body .event-practical-label,
+.soirees-event-body .event-practical-card h3,
+.soirees-event-body .event-practical-card p,
+.soirees-event-body .soirees-program-pending p,
+.soirees-event-body .soirees-program-copy h4,
+.soirees-event-body .soirees-program-copy > div > span,
+.soirees-event-body .soirees-program-copy > p {
+  color: #1e1b29;
+}
 
 .event-practical-label,
 .card-tag,

@@ -1,8 +1,28 @@
-# O'BORD - Site Web
+# O’BORD — La maison du chill
 
-Site web pour O'BORD, un atelier de jeu de détente et feux de camps.
+O’BORD est un collectif basé à Grand-Bassam qui propose des occasions de se retrouver autour du jeu, des échanges et des sorties conviviales. Le site présente le collectif, publie les prochaines rencontres et permet aux participants de demander une réservation.
 
-## 🚀 Démarrage Rapide
+## Fonctionnalités
+
+- Accueil présentant les activités et les prochaines rencontres publiées.
+- Pages À propos, Organisateurs, Contact, Soirées et Vidéos.
+- Agenda relié à Supabase : seules les rencontres publiées et à venir s’affichent.
+- Réservation en solo ou en groupe, avec année de naissance demandée pour chaque participant.
+- Contrôle de l’âge minimum de 21 ans à la date de la rencontre.
+- Back-office privé pour consulter les demandes et confirmer ou refuser les réservations.
+- Pages FAQ et informations légales.
+- Mise en page responsive, adaptée aux téléphones et aux ordinateurs.
+
+Les réservations restent des demandes tant que l’équipe ne les a pas traitées. Aucune présence après réservation n’est demandée aux participants.
+
+## Technologies
+
+- Next.js 16 et React 19
+- TypeScript
+- Tailwind CSS 4 et styles CSS du projet
+- Supabase Auth et PostgreSQL
+
+## Démarrage local
 
 ### 1. Installer les dépendances
 
@@ -12,87 +32,65 @@ npm install
 
 ### 2. Configurer Supabase
 
-1. Créez un compte sur [supabase.com](https://supabase.com)
-2. Créez un nouveau projet
-3. Copiez l'URL et la clé publique (`publishable key`) depuis les paramètres du projet
-4. Créez un fichier `.env.local` à la racine du projet avec :
+Crée un fichier `.env.local` à la racine du projet et renseigne l’URL et la clé publique du projet Supabase :
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=votre_url_supabase
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=votre_cle_publique
-# Ajouter une fois le nom de domaine connu pour les images Open Graph :
-# NEXT_PUBLIC_SITE_URL=https://votre-domaine
+NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<publishable-key>
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-### 3. Démarrer le serveur de développement
+N’ajoute jamais de clé `secret` ou `service_role` à une variable `NEXT_PUBLIC_` ni au dépôt Git.
+
+### 3. Lancer le site
 
 ```bash
 npm run dev
 ```
 
-Le site sera accessible sur [http://localhost:3000](http://localhost:3000)
+Le site sera disponible sur [http://localhost:3000](http://localhost:3000).
 
-## 📱 Pages du Site
+## Commandes utiles
 
-- **Accueil** (`/`) - Présentation du concept O'BORD
-- **À propos** (`/a-propos`) - Histoire, mission, valeurs et équipe
-- **Contact** (`/contact`) - Coordonnées et formulaire e-mail
-- **Organisateurs** (`/organisateurs`) - Les 3 organisateurs du projet
-- **Lieu** (`/lieu`) - Le lieu où se déroulent les événements
-- **Soirées** (`/soirees`) - Dates confirmées et informations pratiques
-- **Espace équipe** (`/backoffice`) - Gestion privée des réservations par les organisateurs
-- **Vidéos** (`/videos`) - Page dédiée aux vidéos
-- **FAQ** (`/faq`) et pages d’informations légales (`/mentions-legales`, `/conditions`, `/confidentialite`, `/cookies`)
-- **Connexion** (`/login`) - Interface d'authentification
+```bash
+npm run lint       # Vérifier le code avec ESLint
+npx tsc --noEmit   # Vérifier les types TypeScript
+npm run build      # Générer la version de production
+npm run start      # Servir la version compilée
+```
 
-## 🎨 Technologies
+## Pages principales
 
-- **Next.js 16** - Framework React
-- **TypeScript** - Typage statique
-- **Tailwind CSS** - Styling
-- **Supabase** - Backend as a Service (Auth, Database, Storage)
+| URL | Contenu |
+| --- | --- |
+| `/` | Accueil, activités et aperçu de l’agenda |
+| `/soirees` | Rencontres à venir et formulaires de réservation |
+| `/a-propos` | Esprit et valeurs du collectif |
+| `/organisateurs` | Malick, Ange Erik et Aurore |
+| `/contact` | Coordonnées et formulaire de contact |
+| `/videos` | Souvenirs vidéo des rencontres |
+| `/login` | Connexion |
+| `/backoffice` | Gestion des réservations pour l’équipe |
 
-## 📝 À Faire
+Les pages `/faq`, `/mentions-legales`, `/conditions`, `/confidentialite` et `/cookies` complètent le site.
 
-- [ ] Configurer Supabase avec les tables requises
-- [x] Implémenter l'authentification Supabase (connexion, création de compte, confirmation e-mail, réinitialisation)
-- [ ] Exécuter le schéma et les données initiales dans Supabase
-- [x] Connecter les pages d’événements à Supabase
-- [ ] Implémenter l'upload de vidéos
-- [ ] Ajouter le panel admin
-- [x] Implémenter les demandes de réservation et leur confirmation par l’équipe
-- [ ] Ajouter les vraies photos et vidéos
+## Base de données Supabase
 
-## 🗄️ Structure de la Base de Données (Supabase)
+Pour créer le schéma, exécute [`supabase/obord_schema.sql`](supabase/obord_schema.sql), puis [`supabase/obord_backoffice.sql`](supabase/obord_backoffice.sql), dans **Supabase → SQL Editor**.
 
-Pour une nouvelle base, exécute [`supabase/obord_schema.sql`](supabase/obord_schema.sql), puis [`supabase/obord_backoffice.sql`](supabase/obord_backoffice.sql) dans **Supabase → SQL Editor**. Pour une base existante, exécute [`supabase/obord_birth_year_requirement.sql`](supabase/obord_birth_year_requirement.sql), puis réexécute `obord_backoffice.sql`, `obord_remove_attendance_confirmation.sql` et [`obord_reservation_rules.sql`](supabase/obord_reservation_rules.sql). Pour activer le compte partagé de l’équipe, exécute ensuite [`supabase/obord_organizer_access.sql`](supabase/obord_organizer_access.sql) ; le compte doit exister dans Supabase Auth et ses utilisateurs doivent se déconnecter puis se reconnecter. Le back-office est disponible sur `/backoffice`; les participants y sont exclus par les règles RLS. À l’inscription, chaque personne indique son année de naissance ; la base vérifie prudemment qu’elle aura 21 ans à la date de la rencontre. L’équipe confirme les réservations; les participants n’ont pas d’étape de confirmation de présence.
+Pour mettre à niveau une base existante, applique les migrations adaptées à son état. Les scripts disponibles couvrent le contrôle de l’âge, les règles de réservation, le back-office et l’accès des organisateurs. Consulte chaque script avant de l’exécuter et conserve les règles RLS activées.
 
-Pour publier le plan chill du samedi 24 octobre 2026 à 14 h (heure d’Abidjan), exécute ensuite [`supabase/seed_plan_chill_2026_10_24.sql`](supabase/seed_plan_chill_2026_10_24.sql). Les participants doivent être connectés pour réserver en solo ou en groupe; l’équipe confirme ou refuse les demandes dans le back-office. Les réservations restent privées.
+Le fichier [`supabase/seed_three_plans_next_three_saturdays.sql`](supabase/seed_three_plans_next_three_saturdays.sql) met à jour le lieu des plans chill et ajoute trois rencontres pour chacun des trois prochains samedis, à partir de 14 h, heure de Grand-Bassam. Il crée neuf rendez-vous au total et peut être relancé sans doublons. Vérifie les dates et les détails avant de publier les rendez-vous dans une base utilisée par les participants.
 
-Le schéma comprend :
+Le schéma utilise notamment ces tables :
 
-- `profiles` - Profils utilisateurs
-- `events` - Soirées/événements
-- `event_activities` - Programme par soirée
-- `event_registrations` - Demandes et décisions de réservation
+- `profiles` : informations de profil
+- `events` : rencontres et détails pratiques
+- `event_activities` : programme des rencontres
+- `event_registrations` : réservations et décisions de l’équipe
 
-Voir le fichier `CAHIER_DE_CHARGE.md` pour plus de détails.
+## Configuration et secrets
 
-## 📄 Documentation
+Les variables locales se placent dans `.env.local`, ignoré par Git. Sur Vercel, configure les variables dans les paramètres du projet pour les environnements concernés (Production, Preview et Development). Après toute modification de variables, redéploie l’application.
 
-- `CAHIER_DE_CHARGE.md` - Cahier de charge complet
-- `CHARTE_GRAPHIQUE.md` - Charte graphique et architecture
-
-## 🎯 Objectifs
-
-Le site O'BORD permet de :
-- ✅ Se faire connaître en ligne
-- ✅ Stocker et partager des vidéos
-- ✅ Présenter les organisateurs et le lieu
-- ✅ Gérer les inscriptions aux soirées
-- ✅ Créer une communauté autour du concept
-
-## 📧 Contact
-
-Pour toute question sur le projet, consultez la page `/contact`.
-# Obord
+La clé publique Supabase peut être utilisée côté navigateur avec les politiques RLS adaptées. Toute clé secrète ou clé de service doit rester exclusivement côté serveur et ne doit jamais être publiée dans le dépôt.

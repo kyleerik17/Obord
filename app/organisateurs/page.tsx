@@ -13,7 +13,7 @@ export default function Organisateurs() {
           Nos Organisateurs
         </h1>
         <p className="font-inter text-xl text-center mb-12 text-gray-600">
-          Malick Mockey, Ange Erik et Aurore — le collectif derrière O’BORD.
+          Malick, Ange Erik et Aurore — le collectif derrière O’BORD.
         </p>
 
         <div className="grid md:grid-cols-3 gap-8">
