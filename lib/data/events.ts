@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { assertPublicEnv, env } from '@/lib/env'
 import type { Activity, UpcomingEventsResult } from './site'
 
 function formatTime(value: string | null) {
@@ -12,7 +13,14 @@ function formatTime(value: string | null) {
 
 export async function getUpcomingEvents(): Promise<UpcomingEventsResult> {
   try {
-    const supabase = await createClient()
+    assertPublicEnv()
+    const supabase = createSupabaseClient(env.supabaseUrl!, env.supabasePublishableKey!, {
+      auth: {
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        persistSession: false,
+      },
+    })
     const { data, error } = await supabase
       .from('events')
       .select('id,title,event_type,starts_at,ends_at,description,venue_name,venue_area,food_and_drinks,participation_details,capacity,status,event_activities(id,title,description,starts_at,sort_order)')
@@ -20,7 +28,18 @@ export async function getUpcomingEvents(): Promise<UpcomingEventsResult> {
       .gte('starts_at', new Date().toISOString())
       .order('starts_at', { ascending: true })
 
-    if (error || !data) return { events: [], error: true }
+    if (error) {
+      console.error('[agenda] Supabase query failed', {
+        code: error.code,
+        message: error.message,
+      })
+      return { events: [], error: true }
+    }
+
+    if (!data) {
+      console.error('[agenda] Supabase returned no event data')
+      return { events: [], error: true }
+    }
 
     return { events: data.map((row) => {
       const activities = [...(row.event_activities ?? [])]
@@ -49,7 +68,8 @@ export async function getUpcomingEvents(): Promise<UpcomingEventsResult> {
         activities,
       }
     }), error: false }
-  } catch {
+  } catch (cause) {
+    console.error('[agenda] Unable to load events', cause instanceof Error ? cause.message : String(cause))
     return { events: [], error: true }
   }
 }
