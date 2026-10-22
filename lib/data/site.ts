@@ -51,6 +51,7 @@ export const organizers: Organizer[] = [
     name: 'Aurore',
     role: 'Collectif',
     initials: 'A',
+    photo: '/aurore.jpeg',
   },
 ]
 

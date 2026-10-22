@@ -40,7 +40,7 @@ export default function AboutPage() {
           <div className="trust-grid trust-grid-three">
             {organizers.map((person) => (
               <article className="trust-card trust-person" key={person.name}>
-                <div className="trust-photo-placeholder">{person.photo ? <Image src={person.photo} alt={`Portrait de ${person.name}`} fill sizes="(max-width: 760px) 100vw, 30vw" className="trust-person-photo" /> : <span>Photo réelle<br />[À COMPLÉTER]</span>}</div>
+                <div className="trust-photo-placeholder">{person.photo ? <Image src={person.photo} alt={`Portrait de ${person.name}`} fill sizes="(max-width: 760px) 100vw, 30vw" className={`trust-person-photo${person.name === 'Aurore' ? ' trust-person-photo-aurore' : ''}`} /> : <span>Photo réelle<br />[À COMPLÉTER]</span>}</div>
                 <h3>{person.name}</h3><p>{person.role}</p>
               </article>
             ))}

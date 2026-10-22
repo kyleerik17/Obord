@@ -20,7 +20,7 @@ export default function Organisateurs() {
           {organizers.map((org, index) => (
             <div key={index} className="soft-card rounded-xl overflow-hidden">
               <div className="relative flex h-64 items-center justify-center overflow-hidden border-b border-line bg-gray-100">
-                {org.photo ? <Image src={org.photo} alt={`Portrait de ${org.name}`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover object-[center_25%]" /> : <span className="flex h-20 w-20 items-center justify-center rounded-full bg-white font-poppins text-2xl font-semibold text-gray-900 shadow-sm">{org.initials}</span>}
+                {org.photo ? <Image src={org.photo} alt={`Portrait de ${org.name}`} fill sizes="(max-width: 768px) 100vw, 33vw" className={`object-cover ${org.name === 'Aurore' ? 'object-[center_45%]' : 'object-[center_25%]'}`} /> : <span className="flex h-20 w-20 items-center justify-center rounded-full bg-white font-poppins text-2xl font-semibold text-gray-900 shadow-sm">{org.initials}</span>}
               </div>
               <div className="p-6">
                 <h2 className="font-poppins text-2xl font-semibold mb-2 text-gray-950">{org.name}</h2>
