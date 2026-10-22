@@ -32,6 +32,8 @@ export async function getUpcomingEvents(): Promise<UpcomingEventsResult> {
       console.error('[agenda] Supabase query failed', {
         code: error.code,
         message: error.message,
+        details: error.details,
+        hint: error.hint,
       })
       return { events: [], error: true }
     }
@@ -40,6 +42,8 @@ export async function getUpcomingEvents(): Promise<UpcomingEventsResult> {
       console.error('[agenda] Supabase returned no event data')
       return { events: [], error: true }
     }
+
+    console.info('[agenda] Upcoming events loaded', { count: data.length })
 
     return { events: data.map((row) => {
       const activities = [...(row.event_activities ?? [])]
@@ -69,7 +73,10 @@ export async function getUpcomingEvents(): Promise<UpcomingEventsResult> {
       }
     }), error: false }
   } catch (cause) {
-    console.error('[agenda] Unable to load events', cause instanceof Error ? cause.message : String(cause))
+    console.error('[agenda] Unable to load events', {
+      name: cause instanceof Error ? cause.name : 'UnknownError',
+      message: cause instanceof Error ? cause.message : String(cause),
+    })
     return { events: [], error: true }
   }
 }
