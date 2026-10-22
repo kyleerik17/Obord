@@ -5,7 +5,7 @@ O’BORD est un collectif basé à Grand-Bassam qui propose des occasions de se 
 ## Fonctionnalités
 
 - Accueil présentant les activités et les prochaines rencontres publiées.
-- Pages À propos, Organisateurs, Contact, Soirées et Vidéos.
+- Pages À propos, Collectif, Contact, Soirées et Vidéos.
 - Agenda relié à Supabase : seules les rencontres publiées et à venir s’affichent.
 - Réservation en solo ou en groupe, avec année de naissance demandée pour chaque participant.
 - Contrôle de l’âge minimum de 21 ans à la date de la rencontre.
@@ -66,7 +66,7 @@ npm run start      # Servir la version compilée
 | `/` | Accueil, activités et aperçu de l’agenda |
 | `/soirees` | Rencontres à venir et formulaires de réservation |
 | `/a-propos` | Esprit et valeurs du collectif |
-| `/organisateurs` | Malick, Ange Erik et Aurore |
+| `/organisateurs` | Le collectif : Malick, Ange Erik et Aurore |
 | `/contact` | Coordonnées et formulaire de contact |
 | `/videos` | Souvenirs vidéo des rencontres |
 | `/login` | Connexion |
@@ -78,9 +78,9 @@ Les pages `/faq`, `/mentions-legales`, `/conditions`, `/confidentialite` et `/co
 
 Pour créer le schéma, exécute [`supabase/obord_schema.sql`](supabase/obord_schema.sql), puis [`supabase/obord_backoffice.sql`](supabase/obord_backoffice.sql), dans **Supabase → SQL Editor**.
 
-Pour mettre à niveau une base existante, applique les migrations adaptées à son état. Les scripts disponibles couvrent le contrôle de l’âge, les règles de réservation, le back-office et l’accès des organisateurs. Consulte chaque script avant de l’exécuter et conserve les règles RLS activées.
+Pour mettre à niveau une base existante, applique les migrations adaptées à son état. Les scripts disponibles couvrent le contrôle de l’âge, les règles de réservation, le back-office et l’accès de l’équipe. Consulte chaque script avant de l’exécuter et conserve les règles RLS activées.
 
-Le fichier [`supabase/seed_three_plans_next_three_saturdays.sql`](supabase/seed_three_plans_next_three_saturdays.sql) met à jour le lieu des plans chill et ajoute trois rencontres pour chacun des trois prochains samedis, à partir de 14 h, heure de Grand-Bassam. Il crée neuf rendez-vous au total et peut être relancé sans doublons. Vérifie les dates et les détails avant de publier les rendez-vous dans une base utilisée par les participants.
+Le fichier [`supabase/weekly_plan_chill.sql`](supabase/weekly_plan_chill.sql) met à jour le lieu des plans chill, publie le prochain rendez-vous à 14 h (heure de Grand-Bassam), puis programme un seul nouveau rendez-vous chaque samedi. Il utilise Supabase Cron (`pg_cron`), qui doit être activé dans les intégrations du projet. Le script peut être relancé sans créer un doublon pour la même date. Vérifie le prochain horaire et les détails avant son exécution.
 
 Le schéma utilise notamment ces tables :
 

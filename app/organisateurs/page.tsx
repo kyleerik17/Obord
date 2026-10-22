@@ -3,14 +3,14 @@ import Image from 'next/image'
 import { organizers } from '@/lib/data/site'
 import { pageMetadata } from '@/lib/metadata'
 
-export const metadata = pageMetadata('Les organisateurs', 'Rencontre les organisateurs du collectif O’BORD à Grand-Bassam.')
+export const metadata = pageMetadata('Le collectif', 'Rencontre Malick, Ange Erik et Aurore, le collectif O’BORD à Grand-Bassam.')
 
 export default function Organisateurs() {
   return (
     <div className="min-h-screen bg-background px-4 py-12">
       <div className="max-w-6xl mx-auto">
         <h1 className="font-poppins text-4xl font-semibold tracking-tight text-center mb-4 text-gray-950">
-          Nos Organisateurs
+          Le collectif O’BORD
         </h1>
         <p className="font-inter text-xl text-center mb-12 text-gray-600">
           Malick, Ange Erik et Aurore — le collectif derrière O’BORD.

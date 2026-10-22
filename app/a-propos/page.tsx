@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { organizers } from '@/lib/data/site'
 import { pageMetadata } from '@/lib/metadata'
 
-export const metadata = pageMetadata('À propos', 'Découvre l’esprit, la mission et les organisateurs du collectif O’BORD à Grand-Bassam.')
+export const metadata = pageMetadata('À propos', 'Découvre l’esprit, la mission et le collectif O’BORD à Grand-Bassam.')
 
 const values = [
   { title: 'La rencontre sans pression', text: 'Chacun participe à son rythme : jouer, discuter, observer ou simplement profiter du moment.' },
@@ -36,7 +36,7 @@ export default function AboutPage() {
         </section>
 
         <section className="trust-team" aria-labelledby="team-title">
-          <div className="trust-section-heading"><p className="eyebrow eyebrow-dark">LES PERSONNES DERRIÈRE LE COLLECTIF</p><h2 id="team-title">L’équipe O’BORD</h2><p>Voici les organisateurs du collectif.</p></div>
+          <div className="trust-section-heading"><p className="eyebrow eyebrow-dark">LES PERSONNES DERRIÈRE LE COLLECTIF</p><h2 id="team-title">L’équipe O’BORD</h2><p>Voici le collectif O’BORD.</p></div>
           <div className="trust-grid trust-grid-three">
             {organizers.map((person) => (
               <article className="trust-card trust-person" key={person.name}>

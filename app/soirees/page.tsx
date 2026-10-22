@@ -91,7 +91,7 @@ export default async function Soirees() {
               <p className="event-practical-label">ON PRÉPARE LA SUITE</p>
               <h2>{eventsError ? 'Les rencontres ne sont pas disponibles pour le moment.' : 'Aucune prochaine date annoncée.'}</h2>
               <p>{eventsError ? 'Le chargement de l’agenda a rencontré un souci. Réessaie dans un moment ou contacte l’équipe.' : 'Les informations d’une rencontre seront ajoutées ici lorsqu’elles seront confirmées.'}</p>
-              <div className="meetup-note-actions"><Link href="/videos" className="meetup-video-link">Accéder à la page vidéos <span aria-hidden="true">↗</span></Link><Link href="/organisateurs" className="meetup-contact-link">Voir les organisateurs</Link></div>
+              <div className="meetup-note-actions"><Link href="/videos" className="meetup-video-link">Accéder à la page vidéos <span aria-hidden="true">↗</span></Link><Link href="/organisateurs" className="meetup-contact-link">Découvrir le collectif</Link></div>
             </div>
           </section>
         )}
