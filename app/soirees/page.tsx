@@ -13,7 +13,6 @@ export default async function Soirees() {
       <header className="soirees-hero" data-reveal>
         <div className="soirees-hero-glow" aria-hidden="true" />
         <div className="soirees-hero-copy">
-          <p className="soirees-kicker"><span className="live-dot" /> LE PLAISIR D’ÊTRE ENSEMBLE</p>
           <h1>Les soirées<br /><span>O’BORD.</span></h1>
           <p>Des jeux, des gens qu’on aime déjà — et d’autres qu’on ne connaît pas encore. On s’occupe du cadre, vous venez comme vous êtes.</p>
           <a href="#rendez-vous" className="soirees-hero-cta">Trouver la soirée qui me ressemble <span aria-hidden="true">↓</span></a>

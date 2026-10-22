@@ -58,7 +58,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       addressLocality: "Grand-Bassam",
       addressCountry: "CI",
     },
-    sameAs: ["https://www.tiktok.com/@0bord"],
+    sameAs: ["https://www.tiktok.com/@obord_777"],
     ...(siteUrl ? { url: siteUrl } : {}),
   };
 

@@ -731,6 +731,7 @@ body:has(.ob-home) .site-footer-brand > p:not(.site-footer-title) {
 .home-contact-card > a:hover { transform: translateY(-2px); background: #5746d8; box-shadow: 0 5px 0 #4939bd, 0 10px 20px #6c5ce744; }
 .agenda-empty a { display: inline-flex; min-height: 44px; align-items: center; gap: 10px; padding: 0 14px; border: 1px solid #5b4bd3; border-radius: 7px; background: var(--primary); box-shadow: 0 3px 0 #4939bd; color: white; font-size: 12px; }
 .agenda-empty a:hover { transform: translateY(-2px); background: #5746d8; }
+.agenda-bottom > span, .live-dot { display: none !important; }
 
 /* Keep the videos page simple and remove the dotted backdrop there. */
 .video-page .soirees-hero { min-height: 420px; }

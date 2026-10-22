@@ -23,7 +23,7 @@ export default function ContactPage() {
             <a href={whatsappHref} target="_blank" rel="noopener noreferrer"><span aria-hidden="true">✳</span><span><small>WhatsApp</small>Écrire au collectif</span></a>
             <a href="mailto:angeerikkyle@gmail.com"><span aria-hidden="true">✉</span><span><small>E-mail</small>angeerikkyle@gmail.com</span></a>
             <div className="contact-detail-static"><span aria-hidden="true">⌖</span><span><small>Ville</small>Grand-Bassam, Côte d’Ivoire</span></div>
-            <a href="https://www.tiktok.com/@0bord" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">♪</span><span><small>TikTok</small>@0BORD</span></a>
+            <a href="https://www.tiktok.com/@obord_777" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">♪</span><span><small>TikTok</small>@obord_777</span></a>
           </section>
           <ContactForm />
         </div>
