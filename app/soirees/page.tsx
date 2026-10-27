@@ -5,8 +5,11 @@ import EventReservation from './event-reservation'
 
 export const metadata = pageMetadata('Soirées et rencontres', 'Découvre les prochaines rencontres et réserve ta place en solo ou en groupe avec O’BORD.')
 
-export default async function Soirees() {
+export default async function Soirees({ searchParams }: { searchParams: Promise<{ plan?: string }> }) {
+  const { plan: selectedPlanId } = await searchParams
   const { events: upcomingEvents, error: eventsError } = await getUpcomingEvents()
+  const selectedPlan = upcomingEvents.find((event) => event.id === selectedPlanId)
+  const displayedEvents = selectedPlan ? [selectedPlan] : upcomingEvents
 
   return (
     <div className="soirees-page">
@@ -26,15 +29,16 @@ export default async function Soirees() {
         <span className="soirees-hero-foot">JEUX · RENCONTRES · BONS SOUVENIRS</span>
       </header>
       <div className="soirees-content" id="rendez-vous">
-        <div className="soirees-section-heading"><div><p className="event-practical-label">CHOISIS TON PROCHAIN MOMENT</p><h2>Les prochains rendez-vous<span>.</span></h2><p className="soirees-heading-help">Regarde les infos, choisis solo ou en groupe, puis envoie ta demande. L’équipe te recontactera pour confirmer.</p></div><span className="soirees-count">{String(upcomingEvents.length).padStart(2, '0')} DATES</span></div>
+        {selectedPlan ? <div className="soirees-selected-heading"><Link href="/soirees#rendez-vous" className="soirees-back-to-plans">← Toutes les rencontres</Link><p className="event-practical-label">LE PLAN QUE TU AS CHOISI</p></div> : null}
+        <div className="soirees-section-heading"><div><p className="event-practical-label">{selectedPlan ? 'TON PROCHAIN MOMENT' : 'CHOISIS TON PROCHAIN MOMENT'}</p><h2>{selectedPlan ? selectedPlan.title : <>Les prochains rendez-vous<span>.</span></>}</h2><p className="soirees-heading-help">{selectedPlan ? 'Voici les détails de cette rencontre et les options pour réserver ta place.' : 'Regarde les infos, choisis un plan pour en voir le détail, puis réserve en solo ou en groupe.'}</p></div><span className="soirees-count">{selectedPlan ? '01 PLAN' : `${String(upcomingEvents.length).padStart(2, '0')} DATES`}</span></div>
 
-        {upcomingEvents.length ? (
+        {displayedEvents.length ? (
           <div className="soirees-event-list">
-            {upcomingEvents.map((event, index) => (
+            {displayedEvents.map((event, index) => (
               <article key={event.id} data-reveal data-reveal-delay={index * 120} className={`soirees-event-card event-card-${index + 1}`} style={{ animationDelay: `${index * 150}ms` }}>
                 <div className="soirees-event-head">
                   <div className="soirees-event-number">0{index + 1}<span> / O’BORD</span></div>
-                  <h2>{event.title}</h2>
+                  <h2>{selectedPlan ? event.title : <Link href={`/soirees?plan=${encodeURIComponent(event.id)}`} aria-label={`Afficher uniquement le plan ${event.title}`}>{event.title}</Link>}</h2>
                   <div className="soirees-event-meta">
                     <span className="rounded-full bg-gray-100 px-3 py-1">{new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Africa/Abidjan' }).format(new Date(event.date))}</span>
                     <span className="rounded-full bg-gray-100 px-3 py-1">{event.time}</span>
@@ -43,7 +47,9 @@ export default async function Soirees() {
                 </div>
 
                 <div className="soirees-event-body">
+                  {event.imageUrls.length > 0 && <div className="event-photo-gallery" aria-label={`Photos de ${event.title}`}>{event.imageUrls.map((url, imageIndex) => <figure key={url}><img src={url} alt={`${event.title} — photo ${imageIndex + 1}`} loading="lazy" /></figure>)}</div>}
                   <p className="soirees-event-description">{event.description}</p>
+                  {event.capacity !== null && <div className="event-availability" aria-live="polite"><span className="event-practical-icon" aria-hidden="true">♙</span><div><p className="event-practical-label">LES PLACES</p>{event.remainingSeats === null ? <strong>Jusqu’à {event.capacity} personnes</strong> : event.remainingSeats === 0 ? <strong>Rencontre complète</strong> : <strong>{event.remainingSeats} place{event.remainingSeats > 1 ? 's' : ''} restante{event.remainingSeats > 1 ? 's' : ''}</strong>}{event.reservedCount !== null && <p>{event.reservedCount} / {event.capacity} places prises</p>}</div></div>}
                   <div className="event-practical-grid">
                     <section className="event-practical-card">
                       <span className="event-practical-icon" aria-hidden="true">⌖</span>
@@ -53,10 +59,10 @@ export default async function Soirees() {
                       <span className="event-practical-icon" aria-hidden="true">☕</span>
                       <div><p className="event-practical-label">PETITE PAUSE CONVIVIALE</p><h3>Un moment à partager</h3><p>{event.foodAndDrinks}</p></div>
                     </section>}
-                    {event.participationDetails && (
+                    {(event.participationDetails || event.title.toLocaleLowerCase('fr').startsWith('plan chill')) && (
                       <section className="event-practical-card food-card">
                         <span className="event-practical-icon" aria-hidden="true">✳</span>
-                      <div><p className="event-practical-label">INFOS PRATIQUES</p><h3>Participation</h3><p>{event.participationDetails}</p></div>
+                      <div><p className="event-practical-label">PARTICIPATION</p><h3>{event.title.toLocaleLowerCase('fr').startsWith('plan chill') ? '3 000 FCFA par personne' : 'Participation'}</h3><p>{event.title.toLocaleLowerCase('fr').startsWith('plan chill') ? 'À régler pour prendre part au plan.' : event.participationDetails}</p></div>
                       </section>
                     )}
                   </div>
@@ -78,13 +84,15 @@ export default async function Soirees() {
                     ))}
                     </div>
                   </> : <div className="soirees-program-pending"><span aria-hidden="true">✳</span><p><strong>Programme en préparation.</strong> Les détails seront partagés par l’équipe avant la rencontre.</p></div>}
-                  <Link href={`#reservation-${event.id}`} className="soirees-booking-link">Réserver ma place <span aria-hidden="true">↘</span></Link>
+                  <Link href={selectedPlan ? `#reservation-${event.id}` : `/soirees?plan=${encodeURIComponent(event.id)}#reservation-${event.id}`} className="soirees-booking-link">Réserver ma place <span aria-hidden="true">↘</span></Link>
                 </div>
-                <EventReservation eventId={event.id} eventDate={event.date} eventEndsAt={event.endsAt} capacity={event.capacity} />
+                <EventReservation eventId={event.id} eventDate={event.date} eventEndsAt={event.endsAt} capacity={event.capacity} remainingSeats={event.remainingSeats} />
               </article>
             ))}
           </div>
-        ) : (
+        ) : selectedPlanId ? (
+          <section className="next-meetup-note"><span className="meetup-note-mark" aria-hidden="true">✳</span><div><p className="event-practical-label">PLAN INDISPONIBLE</p><h2>Cette rencontre n’est plus proposée.</h2><p>Elle a peut-être déjà eu lieu ou les réservations sont closes. Consulte les prochaines dates.</p><Link className="meetup-contact-link" href="/soirees#rendez-vous">Voir les prochaines rencontres</Link></div></section>
+        ) : upcomingEvents.length ? null : (
           <section className="next-meetup-note">
             <span className="meetup-note-mark" aria-hidden="true">✳</span>
             <div>

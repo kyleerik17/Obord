@@ -27,7 +27,7 @@ values (
   'Grand-Bassam',
   null,
   'Le point de rencontre précis sera communiqué après confirmation de la réservation.',
-  null,
+  '3 000 FCFA par personne',
   null,
   'published'
 )

@@ -48,6 +48,13 @@ export default function AccountDashboard() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editType, setEditType] = useState<'solo' | 'group'>('solo')
+  const [editGroupSize, setEditGroupSize] = useState('2')
+  const [editBirthYears, setEditBirthYears] = useState<string[]>([''])
+  const [savingReservationId, setSavingReservationId] = useState<string | null>(null)
+  const [cancelReservationId, setCancelReservationId] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
@@ -116,6 +123,102 @@ export default function AccountDashboard() {
     }
   }
 
+  function beginReservationEdit(reservation: Reservation) {
+    setError('')
+    setNotice('')
+    setEditingId(reservation.id)
+    setEditName(reservation.contact_name)
+    setEditType(reservation.attendance_type)
+    setEditGroupSize(String(reservation.group_size))
+    setEditBirthYears(reservation.attendee_birth_years?.map(String) ?? Array.from({ length: reservation.group_size }, () => ''))
+  }
+
+  async function saveReservation(event: FormEvent<HTMLFormElement>, reservation: Reservation) {
+    event.preventDefault()
+    if (!user || !reservation.event || reservation.reservation_status !== 'pending') return
+
+    const name = editName.trim()
+    const groupSize = editType === 'solo' ? 1 : Number(editGroupSize)
+    const birthYears = editBirthYears.slice(0, groupSize).map(Number)
+    const eventDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Abidjan', year: 'numeric', month: '2-digit' }).format(new Date(reservation.event.starts_at))
+    const [yearText, monthText] = eventDate.split('-')
+    const latestEligibleBirthYear = Number(yearText) - 21 - (Number(monthText) < 7 ? 1 : 0)
+
+    if (name.length < 1 || name.length > 80 || !Number.isInteger(groupSize) || groupSize < (editType === 'solo' ? 1 : 2) || groupSize > 30) {
+      setError('Vérifie le nom et le nombre de personnes indiqué.')
+      return
+    }
+    if (birthYears.length !== groupSize || birthYears.some((year) => !Number.isInteger(year) || year < 1900 || year > latestEligibleBirthYear)) {
+      setError('Chaque participant doit avoir au moins 21 ans à la date de la rencontre. Vérifie les années de naissance.')
+      return
+    }
+
+    setSavingReservationId(reservation.id)
+    setError('')
+    setNotice('')
+    try {
+      const { data, error: updateError } = await getSupabaseBrowserClient()
+        .from('event_registrations')
+        .update({ attendance_type: editType, contact_name: name, group_size: groupSize, attendee_birth_years: birthYears })
+        .eq('id', reservation.id)
+        .eq('user_id', user.id)
+        .eq('reservation_status', 'pending')
+        .select('id')
+        .maybeSingle()
+      if (updateError) throw updateError
+      if (!data) throw new Error('reservation_changed')
+
+      setReservations((current) => current.map((item) => item.id === reservation.id ? {
+        ...item,
+        attendance_type: editType,
+        contact_name: name,
+        group_size: groupSize,
+        attendee_birth_years: birthYears,
+      } : item))
+      setEditingId(null)
+      setNotice('Ta demande a été mise à jour.')
+    } catch (cause) {
+      const message = cause instanceof Error ? cause.message : ''
+      setError(message.includes('event_capacity_reached')
+        ? 'Ce changement dépasse le nombre de places encore disponibles.'
+        : 'La demande a changé ou ne peut plus être modifiée. Actualise la page et réessaie.')
+    } finally {
+      setSavingReservationId(null)
+    }
+  }
+
+  async function cancelReservation(reservation: Reservation) {
+    if (!user || !reservation.event || !['pending', 'confirmed'].includes(reservation.reservation_status)) return
+    if (new Date(reservation.event.starts_at).getTime() <= Date.now()) {
+      setError('La rencontre a commencé. Écris au collectif pour signaler un changement.')
+      return
+    }
+
+    setSavingReservationId(reservation.id)
+    setError('')
+    setNotice('')
+    try {
+      const { data, error: updateError } = await getSupabaseBrowserClient()
+        .from('event_registrations')
+        .update({ reservation_status: 'cancelled' })
+        .eq('id', reservation.id)
+        .eq('user_id', user.id)
+        .eq('reservation_status', reservation.reservation_status)
+        .select('id')
+        .maybeSingle()
+      if (updateError) throw updateError
+      if (!data) throw new Error('reservation_changed')
+
+      setReservations((current) => current.map((item) => item.id === reservation.id ? { ...item, reservation_status: 'cancelled' } : item))
+      setCancelReservationId(null)
+      setNotice('La réservation est annulée et la place a été libérée.')
+    } catch {
+      setError('Cette réservation a changé ou ne peut plus être annulée depuis ton espace. Actualise la page ou contacte le collectif.')
+    } finally {
+      setSavingReservationId(null)
+    }
+  }
+
   if (loading) {
     return <main className="member-page"><section className="member-loading" role="status">Chargement de ton espace…</section></main>
   }
@@ -172,12 +275,24 @@ export default function AccountDashboard() {
                     <p className="member-event-date">{reservation.event?.starts_at ? formatDate(reservation.event.starts_at) : 'Date à confirmer'}</p>
                     {reservation.event && <p className="member-event-location">{reservation.event.venue_area}</p>}
                     {reservation.event?.description && <p className="member-event-description">{reservation.event.description}</p>}
-                    {reservation.reservation_status === 'pending' && <div className="member-next-step"><strong>La suite</strong><span>L’équipe O’BORD te contactera pour confirmer ta place et partager le point de rendez-vous.</span></div>}
-                    {reservation.reservation_status === 'confirmed' && <div className="member-next-step member-next-step-confirmed"><strong>Ta place est confirmée</strong><span>Retrouve les informations pratiques ci-dessus. Le point exact sera communiqué par l’équipe.</span></div>}
+                    {reservation.reservation_status === 'pending' && <div className="member-next-step"><strong>La suite</strong><span>L’équipe O’BORD te contactera pour confirmer ta place et partager le point de rendez-vous. Tu peux modifier ou annuler ta demande jusqu’au début de la rencontre.</span></div>}
+                    {reservation.reservation_status === 'confirmed' && <div className="member-next-step member-next-step-confirmed"><strong>Ta place est confirmée</strong><span>Retrouve les informations pratiques ci-dessus. Tu peux annuler jusqu’au début ; pour toute modification, écris au <Link href="/contact">collectif</Link>.</span></div>}
                     {reservation.event?.status === 'cancelled' && <p className="member-cancelled-note">Cette rencontre a été annulée. Contacte l’équipe si tu as besoin d’informations.</p>}
                     {reservation.event?.status === 'completed' && <p className="member-completed-note">Cette rencontre est terminée. Merci d’avoir partagé ce moment avec O’BORD.</p>}
                     <details className="member-reservation-details"><summary>Voir les informations de ma demande</summary><dl><div><dt>Nom inscrit</dt><dd>{reservation.contact_name}</dd></div><div><dt>E-mail de contact</dt><dd>{reservation.contact_email}</dd></div>{reservation.contact_phone && <div><dt>Téléphone</dt><dd>{reservation.contact_phone}</dd></div>}<div><dt>Participants</dt><dd>{reservation.group_size}</dd></div>{reservation.attendee_birth_years?.length ? <div><dt>Années de naissance enregistrées</dt><dd>{reservation.attendee_birth_years.join(', ')}</dd></div> : null}<div><dt>Demande envoyée</dt><dd>{formatDate(reservation.created_at)}</dd></div></dl></details>
                     {reservation.reservation_status === 'confirmed' && reservation.event && <p className="member-confirmed-note">Ta réservation est confirmée. Aucune autre démarche n’est nécessaire.</p>}
+                    {reservation.event && accountLoadedAt !== null && new Date(reservation.event.starts_at).getTime() > accountLoadedAt && ['pending', 'confirmed'].includes(reservation.reservation_status) && <div className="member-request-actions">
+                      {reservation.reservation_status === 'pending' && <button type="button" className="member-secondary-action" onClick={() => editingId === reservation.id ? setEditingId(null) : beginReservationEdit(reservation)}>{editingId === reservation.id ? 'Fermer la modification' : 'Modifier ma demande'}</button>}
+                      {cancelReservationId === reservation.id ? <div className="member-cancel-confirm"><span>Tu confirmes l’annulation ? La place sera libérée.</span><button type="button" onClick={() => void cancelReservation(reservation)} disabled={savingReservationId === reservation.id}>{savingReservationId === reservation.id ? 'Annulation…' : 'Oui, annuler'}</button><button type="button" onClick={() => setCancelReservationId(null)}>Garder ma place</button></div> : <button type="button" className="member-cancel-action" onClick={() => setCancelReservationId(reservation.id)}>Annuler ma réservation</button>}
+                    </div>}
+                    {editingId === reservation.id && reservation.reservation_status === 'pending' && <form className="member-edit-form" onSubmit={(event) => void saveReservation(event, reservation)}>
+                      <h4>Corriger ma demande</h4>
+                      <label htmlFor={`edit-name-${reservation.id}`}>Nom inscrit</label><input id={`edit-name-${reservation.id}`} maxLength={80} required value={editName} onChange={(event) => setEditName(event.target.value)} />
+                      <fieldset><legend>Tu viens comment ?</legend><label><input type="radio" name={`edit-type-${reservation.id}`} checked={editType === 'solo'} onChange={() => { setEditType('solo'); setEditGroupSize('1'); setEditBirthYears((years) => [years[0] ?? '']) }} /> En solo</label><label><input type="radio" name={`edit-type-${reservation.id}`} checked={editType === 'group'} onChange={() => { setEditType('group'); setEditGroupSize((size) => Number(size) < 2 ? '2' : size); setEditBirthYears((years) => [years[0] ?? '', years[1] ?? '']) }} /> En groupe</label></fieldset>
+                      {editType === 'group' && <><label htmlFor={`edit-size-${reservation.id}`}>Nombre de personnes, toi compris·e</label><input id={`edit-size-${reservation.id}`} type="number" min={2} max={30} required value={editGroupSize} onChange={(event) => { const value = event.target.value; setEditGroupSize(value); const count = Number(value); if (Number.isInteger(count) && count >= 2 && count <= 30) setEditBirthYears((years) => Array.from({ length: count }, (_, index) => years[index] ?? '')) }} /></>}
+                      <div className="member-edit-years">{Array.from({ length: editType === 'solo' ? 1 : Math.min(Math.max(Number(editGroupSize), 0), 30) }, (_, index) => <div key={index}><label htmlFor={`edit-year-${reservation.id}-${index}`}>{editType === 'solo' ? 'Ton année de naissance' : `Année de naissance · personne ${index + 1}`}</label><input id={`edit-year-${reservation.id}-${index}`} type="number" min={1900} max={Number(reservation.event!.starts_at.slice(0, 4)) - 21} required value={editBirthYears[index] ?? ''} onChange={(event) => setEditBirthYears((years) => years.map((year, yearIndex) => yearIndex === index ? event.target.value : year))} /></div>)}</div>
+                      <div className="member-edit-buttons"><button type="submit" className="button-primary" disabled={savingReservationId === reservation.id}>{savingReservationId === reservation.id ? 'Enregistrement…' : 'Enregistrer les corrections'}</button><button type="button" className="member-secondary-action" onClick={() => setEditingId(null)}>Retour</button></div>
+                    </form>}
                   </article>
                 ))}
                 {pastReservations.length > 0 && <><h3 className="member-list-heading member-history-heading">Rencontres passées <span>{pastReservations.length}</span></h3>{pastReservations.map((reservation) => (
@@ -197,6 +312,7 @@ export default function AccountDashboard() {
           </section>
         </div>
       </div>
+      {(error || notice) && <div className="member-global-feedback" role={error ? 'alert' : 'status'}>{error || notice}<button type="button" aria-label="Fermer le message" onClick={() => { setError(''); setNotice('') }}>×</button></div>}
     </main>
   )
 }

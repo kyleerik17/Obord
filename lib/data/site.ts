@@ -22,6 +22,9 @@ export type Event = {
   venueName: string
   venueArea: string
   capacity: number | null
+  reservedCount: number | null
+  remainingSeats: number | null
+  imageUrls: string[]
   foodAndDrinks: string
   participationDetails: string
   eventType: 'sortie' | 'atelier'

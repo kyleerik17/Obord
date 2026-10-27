@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import type { User } from '@supabase/supabase-js'
 import { getSupabaseBrowserClient } from '@/lib/supabase'
@@ -13,7 +13,7 @@ type Reservation = {
   reservation_status: 'pending' | 'confirmed' | 'declined' | 'cancelled'
 }
 
-export default function EventReservation({ eventId, eventDate, eventEndsAt, capacity }: { eventId: string; eventDate: string; eventEndsAt: string | null; capacity: number | null }) {
+export default function EventReservation({ eventId, eventDate, eventEndsAt, capacity, remainingSeats }: { eventId: string; eventDate: string; eventEndsAt: string | null; capacity: number | null; remainingSeats: number | null }) {
   const [user, setUser] = useState<User | null>(null)
   const [reservation, setReservation] = useState<Reservation | null>(null)
   const [attendanceType, setAttendanceType] = useState<'solo' | 'group'>('solo')
@@ -25,6 +25,51 @@ export default function EventReservation({ eventId, eventDate, eventEndsAt, capa
   const [busy, setBusy] = useState(false)
   const [ready, setReady] = useState(false)
   const [eventHasEnded, setEventHasEnded] = useState(false)
+  const audioContextRef = useRef<AudioContext | null>(null)
+
+  function unlockConfirmationSound() {
+    const AudioContextConstructor = window.AudioContext
+    if (!AudioContextConstructor) return
+
+    try {
+      const context = audioContextRef.current ?? new AudioContextConstructor()
+      audioContextRef.current = context
+      if (context.state === 'suspended') void context.resume().catch(() => undefined)
+    } catch {
+      // Sound is optional; the on-screen confirmation remains available.
+    }
+  }
+
+  async function playConfirmationSound() {
+    const context = audioContextRef.current
+    if (!context) return
+
+    try {
+      if (context.state === 'suspended') await context.resume()
+      const startAt = context.currentTime
+      const notes = [
+        { frequency: 523.25, delay: 0 },
+        { frequency: 659.25, delay: 0.12 },
+      ]
+
+      for (const note of notes) {
+        const oscillator = context.createOscillator()
+        const volume = context.createGain()
+        const noteStart = startAt + note.delay
+        oscillator.type = 'sine'
+        oscillator.frequency.setValueAtTime(note.frequency, noteStart)
+        volume.gain.setValueAtTime(0.0001, noteStart)
+        volume.gain.exponentialRampToValueAtTime(0.12, noteStart + 0.025)
+        volume.gain.exponentialRampToValueAtTime(0.0001, noteStart + 0.32)
+        oscillator.connect(volume)
+        volume.connect(context.destination)
+        oscillator.start(noteStart)
+        oscillator.stop(noteStart + 0.34)
+      }
+    } catch {
+      // Some devices or browser settings block sound; do not affect the reservation.
+    }
+  }
 
   useEffect(() => {
     let active = true
@@ -87,6 +132,7 @@ export default function EventReservation({ eventId, eventDate, eventEndsAt, capa
       return
     }
 
+    unlockConfirmationSound()
     setBusy(true)
     setError('')
     setMessage('')
@@ -109,7 +155,8 @@ export default function EventReservation({ eventId, eventDate, eventEndsAt, capa
 
       if (insertError) throw insertError
       setReservation(data)
-      setMessage('Ta demande est envoyée. L’équipe O’BORD te confirmera la réservation.')
+      setMessage('C’est envoyé, ta demande est bien au chaud. L’équipe O’BORD te contactera pour confirmer ta place.')
+      void playConfirmationSound()
     } catch (submissionError) {
       const code = typeof submissionError === 'object' && submissionError !== null && 'code' in submissionError
         ? String(submissionError.code)
@@ -148,7 +195,7 @@ export default function EventReservation({ eventId, eventDate, eventEndsAt, capa
       ) : reservation && !['declined', 'cancelled'].includes(reservation.reservation_status) ? (
         <div className="registration-form">
           <div className="registration-form-heading"><div><span>TA DEMANDE</span><h3>{reservation.attendance_type === 'solo' ? 'Réservation solo' : `Réservation pour ${reservation.group_size} personnes`}</h3></div><span className="registration-form-spark" aria-hidden="true">✳</span></div>
-          {reservation.reservation_status === 'pending' && <p role="status" className="registration-help">Demande reçue, en attente de confirmation par l’équipe O’BORD.</p>}
+          {reservation.reservation_status === 'pending' && <p role="status" className="registration-help">{message || 'Demande reçue, en attente de confirmation par l’équipe O’BORD.'}</p>}
           {reservation.reservation_status === 'confirmed' && <p role="status" className="registration-help">Ta réservation est confirmée. Aucune autre démarche n’est nécessaire.</p>}
         </div>
       ) : eventHasEnded ? (
@@ -172,7 +219,7 @@ export default function EventReservation({ eventId, eventDate, eventEndsAt, capa
             }} /></div>}
           </div>
           <div className="registration-age-notice"><strong>Rencontres réservées aux personnes de 21 ans et plus à la date de la rencontre.</strong><span>Indique l’année de naissance de chaque personne{attendanceType === 'group' ? ', toi compris·e' : ''}. Comme nous ne demandons pas la date complète, certaines années proches du seuil sont refusées par prudence.</span></div>
-          {capacity !== null && <p className="registration-privacy">Capacité maximale : {capacity} personnes. Les demandes en attente comptent dans cette limite.</p>}
+          {capacity !== null && <p className="registration-privacy">{remainingSeats === null ? `Capacité maximale : ${capacity} personnes.` : remainingSeats === 0 ? 'Cette rencontre affiche complet.' : `Il reste ${remainingSeats} place${remainingSeats > 1 ? 's' : ''} sur ${capacity}.`} Les demandes en attente comptent dans cette limite.</p>}
           <div className="registration-age-fields">
             {Array.from({ length: attendanceType === 'solo' ? 1 : Math.min(Math.max(Number(groupSize), 0), 30) }, (_, index) => (
               <div key={index}>
@@ -184,7 +231,7 @@ export default function EventReservation({ eventId, eventDate, eventEndsAt, capa
           <p className="registration-privacy">La demande reste privée. L’équipe te communiquera le point de rencontre après confirmation.</p>
           {error && <p role="alert" className="registration-help">{error}</p>}
           {message && <p role="status" className="registration-help">{message}</p>}
-          <button type="submit" disabled={busy} className="button-primary registration-submit">{busy ? 'On prépare ta demande…' : 'Oui, je demande ma place'} <span aria-hidden="true">↗</span></button>
+          <button type="submit" disabled={busy || remainingSeats === 0} className="button-primary registration-submit">{busy ? 'On prépare ta demande…' : remainingSeats === 0 ? 'Rencontre complète' : 'Oui, je demande ma place'} {!busy && remainingSeats !== 0 && <span aria-hidden="true">↗</span>}</button>
         </form>
       )}
 

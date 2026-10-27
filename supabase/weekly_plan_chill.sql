@@ -11,10 +11,7 @@ create extension if not exists pg_cron;
 
 update public.events
 set venue_area = 'Quartier France, Grand-Bassam',
-    participation_details = case
-      when participation_details ~* '(bouteille|vodka|liqueur|alcool)' then null
-      else participation_details
-    end,
+    participation_details = '3 000 FCFA par personne',
     food_and_drinks = case
       when food_and_drinks ~* '(bouteille|vodka|liqueur|alcool)' then null
       else food_and_drinks
@@ -67,10 +64,7 @@ begin
   -- Keep an existing Plan chill (including a manually seeded one) and correct its venue.
   update public.events
   set venue_area = 'Quartier France, Grand-Bassam',
-      participation_details = case
-        when participation_details ~* '(bouteille|vodka|liqueur|alcool)' then null
-        else participation_details
-      end,
+      participation_details = '3 000 FCFA par personne',
       food_and_drinks = case
         when food_and_drinks ~* '(bouteille|vodka|liqueur|alcool)' then null
         else food_and_drinks
@@ -103,7 +97,7 @@ begin
     'Quartier France, Grand-Bassam',
     null,
     'Le point de rencontre précis sera communiqué après confirmation de la réservation.',
-    null,
+    '3 000 FCFA par personne',
     'published'
   )
   on conflict (id) do nothing;

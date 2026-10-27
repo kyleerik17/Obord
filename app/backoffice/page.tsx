@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { pageMetadata } from '@/lib/metadata'
 import { saveReservationBirthYears, updateReservationDecision } from './actions'
+import EventPhotoManager from './EventPhotoManager'
 
 export const dynamic = 'force-dynamic'
 export const metadata = pageMetadata('Espace équipe', 'Espace privé de gestion des réservations O’BORD.')
@@ -58,6 +59,16 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
     .select('id,event_id,attendance_type,contact_name,contact_email,contact_phone,group_size,attendee_birth_years,reservation_status,message,created_at,event:events!inner(title,starts_at)')
     .order('created_at', { ascending: false })
 
+  const { data: photoEventsData, error: photoEventsError } = await supabase
+    .from('events')
+    .select('id,title,starts_at,image_paths')
+    .eq('status', 'published')
+    .gte('starts_at', new Date().toISOString())
+    .order('starts_at', { ascending: true })
+
+  const photoEvents = (photoEventsData ?? []) as unknown as Array<{ id: string; title: string; starts_at: string; image_paths: string[] }>
+  const photoManagerSetupMissing = Boolean(photoEventsError)
+
   const reservations = (data ?? []) as unknown as Reservation[]
   const pendingCount = reservations.filter((reservation) => reservation.reservation_status === 'pending').length
   const confirmedCount = reservations.filter((reservation) => reservation.reservation_status === 'confirmed').length
@@ -111,6 +122,8 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
             <div><span>Demandes <strong>{stats.requests}</strong></span><span>À traiter <strong>{stats.pending}</strong></span><span>Confirmées <strong>{stats.confirmed}</strong></span></div>
           </article>)}</div>
         </section>}
+
+        <EventPhotoManager initialEvents={photoEvents} setupMissing={photoManagerSetupMissing} />
 
         {result && resultMessages[result] && <p className="backoffice-feedback" role="status">{resultMessages[result]}</p>}
         {error ? (

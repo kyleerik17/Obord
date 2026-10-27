@@ -45,6 +45,30 @@ export async function getUpcomingEvents(): Promise<UpcomingEventsResult> {
 
     console.info('[agenda] Upcoming events loaded', { count: data.length })
 
+    const [availabilityResult, imagesResult] = data.length ? await Promise.all([
+      supabase.rpc('get_public_event_availability', { p_event_ids: data.map((row) => row.id) }),
+      supabase.from('events').select('id,image_paths').in('id', data.map((row) => row.id)),
+    ]) : [
+      { data: [], error: null },
+      { data: [], error: null },
+    ]
+
+    if (availabilityResult.error) {
+      console.warn('[agenda] Public capacity summary is not configured yet', { code: availabilityResult.error.code })
+    }
+    if (imagesResult.error) {
+      console.warn('[agenda] Event gallery is not configured yet', { code: imagesResult.error.code })
+    }
+
+    const availabilityRows = (availabilityResult.data ?? []) as Array<{
+      event_id: string
+      reserved_count: number
+      remaining_count: number | null
+    }>
+    const imageRows = (imagesResult.data ?? []) as Array<{ id: string; image_paths: string[] | null }>
+    const availabilityByEvent = new Map(availabilityRows.map((item) => [item.event_id, item]))
+    const imagePathsByEvent = new Map(imageRows.map((item) => [item.id, item.image_paths ?? []]))
+
     return { events: data.map((row) => {
       const activities = [...(row.event_activities ?? [])]
         .sort((left, right) => left.sort_order - right.sort_order)
@@ -65,8 +89,15 @@ export async function getUpcomingEvents(): Promise<UpcomingEventsResult> {
         venueName: row.venue_name ?? 'Lieu précis communiqué après confirmation',
         venueArea: row.venue_area,
         capacity: row.capacity,
+        reservedCount: availabilityByEvent.get(row.id)?.reserved_count ?? null,
+        remainingSeats: availabilityByEvent.get(row.id)?.remaining_count ?? null,
+        imageUrls: (imagePathsByEvent.get(row.id) ?? []).map((path: string) =>
+          supabase.storage.from('obord-event-photos').getPublicUrl(path).data.publicUrl,
+        ),
         foodAndDrinks: /bouteille|vodka|liqueur|alcool/i.test(row.food_and_drinks ?? '') ? '' : row.food_and_drinks ?? '',
-        participationDetails: /bouteille|vodka|liqueur|alcool/i.test(row.participation_details ?? '') ? '' : row.participation_details ?? '',
+        participationDetails: row.title.toLocaleLowerCase('fr').startsWith('plan chill')
+          ? '3 000 FCFA par personne'
+          : /bouteille|vodka|liqueur|alcool/i.test(row.participation_details ?? '') ? '' : row.participation_details ?? '',
         eventType: row.event_type,
         status: 'upcoming',
         activities,

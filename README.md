@@ -11,6 +11,9 @@ O’BORD est un collectif basé à Grand-Bassam qui propose des occasions de se 
 - Contrôle de l’âge minimum de 21 ans à la date de la rencontre.
 - Espace personnel pour modifier son nom et consulter l’historique de ses demandes.
 - Back-office privé pour consulter les demandes et confirmer ou refuser les réservations.
+- Espace membre permettant de corriger une demande en attente ou d’annuler sa place avant le début du rendez-vous.
+- Galerie de photos réelles des rencontres, administrée depuis l’espace équipe.
+- Nombre de places restantes calculé à partir des réservations actives lorsque la capacité est définie.
 - Pages FAQ et informations légales.
 - Mise en page responsive, adaptée aux téléphones et aux ordinateurs.
 
@@ -66,6 +69,7 @@ npm run start      # Servir la version compilée
 | --- | --- |
 | `/` | Accueil, activités et aperçu de l’agenda |
 | `/soirees` | Rencontres à venir et formulaires de réservation |
+| `/soirees?plan=<id>` | Affiche un seul rendez-vous choisi depuis l’agenda |
 | `/a-propos` | Esprit et valeurs du collectif |
 | `/organisateurs` | Le collectif : Malick, Ange Erik et Aurore |
 | `/contact` | Coordonnées et formulaire de contact |
@@ -84,7 +88,11 @@ Pour mettre à niveau une base existante, applique les migrations adaptées à s
 
 Pour permettre à chaque participant de retrouver aussi les rencontres passées liées à ses réservations, exécute [`supabase/obord_member_space.sql`](supabase/obord_member_space.sql) dans le SQL Editor.
 
+Pour activer le nombre de places restantes, l’édition/annulation autonome et l’ajout de photos depuis le back-office, exécute d’abord [`supabase/obord_birth_year_requirement.sql`](supabase/obord_birth_year_requirement.sql) si cette règle n’est pas déjà installée, puis [`supabase/obord_capacity_member_edits_event_photos.sql`](supabase/obord_capacity_member_edits_event_photos.sql) dans le SQL Editor. Les photos publiées seront accessibles publiquement ; seul un compte organisateur peut les envoyer ou les retirer.
+
 Le fichier [`supabase/weekly_plan_chill.sql`](supabase/weekly_plan_chill.sql) met à jour le lieu des plans chill, publie le prochain rendez-vous à 14 h (heure de Grand-Bassam), puis programme un seul nouveau rendez-vous chaque samedi. Il utilise Supabase Cron (`pg_cron`), qui doit être activé dans les intégrations du projet. Le script peut être relancé sans créer un doublon pour la même date. Vérifie le prochain horaire et les détails avant son exécution.
+
+Pour enregistrer la participation de 3 000 FCFA sur les plans chill publiés à venir dans une base existante, exécute [`supabase/plan_chill_participation_3000.sql`](supabase/plan_chill_participation_3000.sql) dans le SQL Editor. Les nouveaux plans créés par le script hebdomadaire auront aussi ce montant.
 
 Le schéma utilise notamment ces tables :
 
