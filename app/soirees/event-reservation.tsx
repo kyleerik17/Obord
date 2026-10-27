@@ -143,7 +143,7 @@ export default function EventReservation({ eventId, eventDate, eventEndsAt, capa
       {!ready ? <p role="status" className="registration-help">Chargement du formulaire…</p> : !user ? (
         <div className="registration-form text-center">
           <p className="registration-help">Connecte-toi pour envoyer une demande de réservation et suivre sa confirmation.</p>
-          <Link href="/login" className="button-primary registration-submit">Me connecter pour réserver ma place <span aria-hidden="true">↗</span></Link>
+          <Link href={`/login?next=${encodeURIComponent(`/soirees#reservation-${eventId}`)}`} className="button-primary registration-submit">Me connecter pour réserver ma place <span aria-hidden="true">↗</span></Link>
         </div>
       ) : reservation && !['declined', 'cancelled'].includes(reservation.reservation_status) ? (
         <div className="registration-form">

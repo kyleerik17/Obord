@@ -71,6 +71,7 @@ export default function Navbar() {
             <Link href="/contact" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">Contact</Link>
             {isSignedIn ? (
               <div className="flex items-center gap-3">
+                <Link href="/mon-espace" className="font-medium text-gray-700 hover:text-gray-950">Mon espace</Link>
                 {isOrganizer && <Link href="/backoffice" className="font-medium text-gray-700 hover:text-gray-950">Espace équipe</Link>}
                 <button type="button" onClick={signOut} className="rounded-full bg-gray-950 px-4 py-2 font-medium text-white hover:bg-secondary">Déconnexion</button>
               </div>
@@ -106,6 +107,7 @@ export default function Navbar() {
             <Link onClick={() => setIsOpen(false)} href="/contact" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Contact</Link>
             {isSignedIn ? (
               <>
+                <Link onClick={() => setIsOpen(false)} href="/mon-espace" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Mon espace</Link>
                 {isOrganizer && <Link onClick={() => setIsOpen(false)} href="/backoffice" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Espace équipe</Link>}
                 <button type="button" onClick={signOut} className="block w-full rounded-lg bg-gray-950 px-3 py-2 text-white hover:bg-secondary">Déconnexion</button>
               </>

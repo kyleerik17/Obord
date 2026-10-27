@@ -11,10 +11,35 @@ create extension if not exists pg_cron;
 
 update public.events
 set venue_area = 'Quartier France, Grand-Bassam',
+    participation_details = case
+      when participation_details ~* '(bouteille|vodka|liqueur|alcool)' then null
+      else participation_details
+    end,
+    food_and_drinks = case
+      when food_and_drinks ~* '(bouteille|vodka|liqueur|alcool)' then null
+      else food_and_drinks
+    end,
     updated_at = now()
 where title ilike 'Plan chill%'
   and starts_at >= now()
   and status = 'published';
+
+-- No bottle or alcohol is expected at an O’BORD meeting.
+update public.events
+set participation_details = case
+      when participation_details ~* '(bouteille|vodka|liqueur|alcool)' then null
+      else participation_details
+    end,
+    food_and_drinks = case
+      when food_and_drinks ~* '(bouteille|vodka|liqueur|alcool)' then null
+      else food_and_drinks
+    end,
+    updated_at = now()
+where title ilike 'Plan chill%'
+  and (
+    participation_details ~* '(bouteille|vodka|liqueur|alcool)'
+    or food_and_drinks ~* '(bouteille|vodka|liqueur|alcool)'
+  );
 
 create or replace function public.obord_create_next_plan_chill()
 returns void
@@ -42,6 +67,14 @@ begin
   -- Keep an existing Plan chill (including a manually seeded one) and correct its venue.
   update public.events
   set venue_area = 'Quartier France, Grand-Bassam',
+      participation_details = case
+        when participation_details ~* '(bouteille|vodka|liqueur|alcool)' then null
+        else participation_details
+      end,
+      food_and_drinks = case
+        when food_and_drinks ~* '(bouteille|vodka|liqueur|alcool)' then null
+        else food_and_drinks
+      end,
       updated_at = now()
   where title ilike 'Plan chill%'
     and starts_at = plan_start;
@@ -70,7 +103,7 @@ begin
     'Quartier France, Grand-Bassam',
     null,
     'Le point de rencontre précis sera communiqué après confirmation de la réservation.',
-    'Une bouteille de liqueur ou de vodka par personne. Réservé aux personnes de 21 ans et plus ; la consommation d’alcool reste facultative.',
+    null,
     'published'
   )
   on conflict (id) do nothing;

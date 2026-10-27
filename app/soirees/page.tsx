@@ -14,8 +14,8 @@ export default async function Soirees() {
         <div className="soirees-hero-glow" aria-hidden="true" />
         <div className="soirees-hero-copy">
           <h1>Les soirées<br /><span>O’BORD.</span></h1>
-          <p>Des jeux, des gens qu’on aime déjà — et d’autres qu’on ne connaît pas encore. On s’occupe du cadre, vous venez comme vous êtes.</p>
-          <a href="#rendez-vous" className="soirees-hero-cta">Trouver la soirée qui me ressemble <span aria-hidden="true">↓</span></a>
+          <p>Choisis une rencontre, réserve ta place et viens comme tu es. En solo ou avec ta bande, l’équipe t’accueille pour jouer, discuter et faire connaissance à ton rythme.</p>
+          <a href="#rendez-vous" className="soirees-hero-cta">Voir les prochaines dates <span aria-hidden="true">↓</span></a>
         </div>
         <div className="soirees-hero-art" aria-hidden="true">
           <span className="soirees-orbit soirees-orbit-one" /><span className="soirees-orbit soirees-orbit-two" />
@@ -26,7 +26,7 @@ export default async function Soirees() {
         <span className="soirees-hero-foot">JEUX · RENCONTRES · BONS SOUVENIRS</span>
       </header>
       <div className="soirees-content" id="rendez-vous">
-        <div className="soirees-section-heading"><div><p className="event-practical-label">À NOTER DANS TON AGENDA</p><h2>Les prochains rendez-vous<span>.</span></h2></div><span className="soirees-count">{String(upcomingEvents.length).padStart(2, '0')} DATES</span></div>
+        <div className="soirees-section-heading"><div><p className="event-practical-label">CHOISIS TON PROCHAIN MOMENT</p><h2>Les prochains rendez-vous<span>.</span></h2><p className="soirees-heading-help">Regarde les infos, choisis solo ou en groupe, puis envoie ta demande. L’équipe te recontactera pour confirmer.</p></div><span className="soirees-count">{String(upcomingEvents.length).padStart(2, '0')} DATES</span></div>
 
         {upcomingEvents.length ? (
           <div className="soirees-event-list">
@@ -47,16 +47,16 @@ export default async function Soirees() {
                   <div className="event-practical-grid">
                     <section className="event-practical-card">
                       <span className="event-practical-icon" aria-hidden="true">⌖</span>
-                      <div><p className="event-practical-label">LE LIEU DU RENDEZ-VOUS</p><h3>{event.venueArea}</h3><p>{event.venueName}</p></div>
+                      <div><p className="event-practical-label">LE LIEU DU RENDEZ-VOUS</p><h3>{event.venueArea}</h3><p>{event.venueName || 'Le point de rencontre exact sera communiqué après confirmation.'}</p></div>
                     </section>
                     {event.foodAndDrinks && <section className="event-practical-card food-card">
                       <span className="event-practical-icon" aria-hidden="true">☕</span>
-                      <div><p className="event-practical-label">UN MOMENT À PARTAGER</p><h3>La convivialité à table</h3><p>{event.foodAndDrinks}</p></div>
+                      <div><p className="event-practical-label">PETITE PAUSE CONVIVIALE</p><h3>Un moment à partager</h3><p>{event.foodAndDrinks}</p></div>
                     </section>}
                     {event.participationDetails && (
                       <section className="event-practical-card food-card">
                         <span className="event-practical-icon" aria-hidden="true">✳</span>
-                        <div><p className="event-practical-label">PARTICIPATION</p><h3>À prévoir par personne</h3><p>{event.participationDetails}</p></div>
+                      <div><p className="event-practical-label">INFOS PRATIQUES</p><h3>Participation</h3><p>{event.participationDetails}</p></div>
                       </section>
                     )}
                   </div>
@@ -78,7 +78,7 @@ export default async function Soirees() {
                     ))}
                     </div>
                   </> : <div className="soirees-program-pending"><span aria-hidden="true">✳</span><p><strong>Programme en préparation.</strong> Les détails seront partagés par l’équipe avant la rencontre.</p></div>}
-                  <Link href={`#reservation-${event.id}`} className="soirees-booking-link">Allez, je veux être de la partie <span aria-hidden="true">↘</span></Link>
+                  <Link href={`#reservation-${event.id}`} className="soirees-booking-link">Réserver ma place <span aria-hidden="true">↘</span></Link>
                 </div>
                 <EventReservation eventId={event.id} eventDate={event.date} eventEndsAt={event.endsAt} capacity={event.capacity} />
               </article>

@@ -25,6 +25,9 @@ export default function Login() {
     try {
       const supabase = getSupabaseBrowserClient()
       const callbackUrl = new URL('/auth/confirm', window.location.origin)
+      const requestedNext = new URLSearchParams(window.location.search).get('next')
+      const hasSafeReturnPath = requestedNext?.startsWith('/') && !requestedNext.startsWith('//') && !requestedNext.includes('\\')
+      if (mode === 'signup' && hasSafeReturnPath && requestedNext) callbackUrl.searchParams.set('next', requestedNext)
 
       if (mode === 'reset') {
         callbackUrl.searchParams.set('next', '/login/update-password')
@@ -56,11 +59,10 @@ export default function Login() {
       }
 
       if (response.data.session) {
-        const requestedPath = new URLSearchParams(window.location.search).get('next')
-        const hasSafeReturnPath = requestedPath?.startsWith('/') && !requestedPath.startsWith('//') && !requestedPath.includes('\\')
+        const requestedPath = requestedNext
         const returnPath = hasSafeReturnPath && requestedPath && !(requestedPath === '/' && response.data.user?.app_metadata?.role === 'organizer')
           ? requestedPath
-          : response.data.user?.app_metadata?.role === 'organizer' ? '/backoffice' : '/'
+          : response.data.user?.app_metadata?.role === 'organizer' ? '/backoffice' : '/mon-espace'
         router.replace(returnPath)
         router.refresh()
       } else if (isLogin) {

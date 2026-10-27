@@ -27,7 +27,7 @@ values (
   'Grand-Bassam',
   null,
   'Le point de rencontre précis sera communiqué après confirmation de la réservation.',
-  'Une bouteille de liqueur ou de vodka par personne. Réservé aux personnes majeures ; la consommation d’alcool reste facultative.',
+  null,
   null,
   'published'
 )

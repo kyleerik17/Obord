@@ -9,6 +9,7 @@ O’BORD est un collectif basé à Grand-Bassam qui propose des occasions de se 
 - Agenda relié à Supabase : seules les rencontres publiées et à venir s’affichent.
 - Réservation en solo ou en groupe, avec année de naissance demandée pour chaque participant.
 - Contrôle de l’âge minimum de 21 ans à la date de la rencontre.
+- Espace personnel pour modifier son nom et consulter l’historique de ses demandes.
 - Back-office privé pour consulter les demandes et confirmer ou refuser les réservations.
 - Pages FAQ et informations légales.
 - Mise en page responsive, adaptée aux téléphones et aux ordinateurs.
@@ -70,6 +71,7 @@ npm run start      # Servir la version compilée
 | `/contact` | Coordonnées et formulaire de contact |
 | `/videos` | Souvenirs vidéo des rencontres |
 | `/login` | Connexion |
+| `/mon-espace` | Profil et historique privé des réservations |
 | `/backoffice` | Gestion des réservations pour l’équipe |
 
 Les pages `/faq`, `/mentions-legales`, `/conditions`, `/confidentialite` et `/cookies` complètent le site.
@@ -79,6 +81,8 @@ Les pages `/faq`, `/mentions-legales`, `/conditions`, `/confidentialite` et `/co
 Pour créer le schéma, exécute [`supabase/obord_schema.sql`](supabase/obord_schema.sql), puis [`supabase/obord_backoffice.sql`](supabase/obord_backoffice.sql), dans **Supabase → SQL Editor**.
 
 Pour mettre à niveau une base existante, applique les migrations adaptées à son état. Les scripts disponibles couvrent le contrôle de l’âge, les règles de réservation, le back-office et l’accès de l’équipe. Consulte chaque script avant de l’exécuter et conserve les règles RLS activées.
+
+Pour permettre à chaque participant de retrouver aussi les rencontres passées liées à ses réservations, exécute [`supabase/obord_member_space.sql`](supabase/obord_member_space.sql) dans le SQL Editor.
 
 Le fichier [`supabase/weekly_plan_chill.sql`](supabase/weekly_plan_chill.sql) met à jour le lieu des plans chill, publie le prochain rendez-vous à 14 h (heure de Grand-Bassam), puis programme un seul nouveau rendez-vous chaque samedi. Il utilise Supabase Cron (`pg_cron`), qui doit être activé dans les intégrations du projet. Le script peut être relancé sans créer un doublon pour la même date. Vérifie le prochain horaire et les détails avant son exécution.
 

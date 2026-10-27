@@ -6,6 +6,7 @@ const quickLinks = [
   { href: '/#ateliers', label: 'Ateliers' },
   { href: '/soirees', label: 'Agenda' },
   { href: '/faq', label: 'Questions fréquentes' },
+  { href: '/mon-espace', label: 'Mon espace' },
   { href: '/contact', label: 'Contact' },
   { href: '/backoffice', label: 'Espace équipe' },
 ]
