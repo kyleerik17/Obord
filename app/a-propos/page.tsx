@@ -15,7 +15,7 @@ export default function AboutPage() {
   return (
     <div className="trust-page">
       <header className="trust-hero">
-        <p className="eyebrow eyebrow-dark">✳ LA MAISON DU CHILL</p>
+        <p className="eyebrow eyebrow-dark">LA MAISON DU CHILL</p>
         <h1>À propos<br /><span>d’O’BORD.</span></h1>
         <p>Un collectif de Grand-Bassam qui crée des occasions de se retrouver, de jouer et de faire connaissance, tout simplement.</p>
       </header>
@@ -29,9 +29,9 @@ export default function AboutPage() {
         </section>
 
         <section className="trust-values" aria-labelledby="values-title">
-          <div className="trust-section-heading"><p className="eyebrow eyebrow-dark">✦ CE QUI NOUS RASSEMBLE</p><h2 id="values-title">L’esprit O’BORD</h2></div>
+          <div className="trust-section-heading"><p className="eyebrow eyebrow-dark">CE QUI NOUS RASSEMBLE</p><h2 id="values-title">L’esprit O’BORD</h2></div>
           <div className="trust-grid trust-grid-three">
-            {values.map((value) => <article className="trust-card" key={value.title}><span className="trust-card-mark" aria-hidden="true">✳</span><h3>{value.title}</h3><p>{value.text}</p></article>)}
+            {values.map((value) => <article className="trust-card" key={value.title}><h3>{value.title}</h3><p>{value.text}</p></article>)}
           </div>
         </section>
 

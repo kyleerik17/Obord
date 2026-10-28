@@ -49,7 +49,7 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
   if (user.app_metadata?.role !== 'organizer') {
     return (
       <div className="trust-page">
-        <header className="trust-hero trust-hero-compact"><p className="eyebrow eyebrow-dark">✳ ESPACE ÉQUIPE</p><h1>Accès réservé.</h1><p>Connecte-toi avec un compte organisateur O’BORD pour consulter les réservations.</p></header>
+        <header className="trust-hero trust-hero-compact"><p className="eyebrow eyebrow-dark">ESPACE ÉQUIPE</p><h1>Accès réservé.</h1><p>Connecte-toi avec un compte organisateur O’BORD pour consulter les réservations.</p></header>
         <div className="trust-content"><section className="trust-card"><p>Ce compte n’a pas le rôle organisateur. Si tu fais partie de l’équipe, demande à l’administrateur du projet Supabase de l’activer dans les App Metadata.</p><Link className="button-primary" href="/">Retour à l’accueil <span aria-hidden="true">↗</span></Link></section></div>
       </div>
     )
@@ -110,9 +110,9 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
   return (
     <div className="trust-page backoffice-page">
       <header className="trust-hero trust-hero-compact">
-        <p className="eyebrow eyebrow-dark">✳ ESPACE ÉQUIPE · O’BORD</p>
+        <p className="eyebrow eyebrow-dark">ESPACE ÉQUIPE · O’BORD</p>
         <h1>Les réservations<span>.</span></h1>
-        <p>Connecté·e en tant que {user.email}. Consulte les demandes et confirme celles que l’équipe peut accueillir.</p>
+        <p>Retrouve les demandes et les confirmations de chaque rencontre en un seul endroit.</p>
       </header>
 
       <div className="trust-content">
@@ -137,7 +137,7 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
         {error ? (
           <section className="trust-card"><h2>Les demandes ne sont pas accessibles.</h2><p>Vérifie que le script SQL du back-office a été exécuté dans Supabase et que le rôle organisateur est actif sur ce compte.</p></section>
         ) : reservations.length === 0 ? (
-          <section className="trust-card backoffice-empty"><span aria-hidden="true">✳</span><h2>Aucune réservation pour le moment.</h2><p>Les demandes envoyées depuis la page des rencontres apparaîtront ici.</p></section>
+          <section className="trust-card backoffice-empty"><h2>Aucune réservation pour le moment.</h2><p>Les demandes envoyées depuis la page des rencontres apparaîtront ici.</p></section>
         ) : (
           <div className="backoffice-list">
             {reservations.map((reservation) => (

@@ -17,7 +17,7 @@ export default function FAQPage() {
   return (
     <div className="trust-page">
       <header className="trust-hero">
-        <p className="eyebrow eyebrow-dark">✳ LES RÉPONSES SIMPLES</p>
+        <p className="eyebrow eyebrow-dark">LES RÉPONSES SIMPLES</p>
         <h1>Questions<br /><span>fréquentes.</span></h1>
         <p>Les informations pratiques sur les rencontres et les réservations O’BORD.</p>
       </header>

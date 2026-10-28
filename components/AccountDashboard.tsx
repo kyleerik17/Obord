@@ -226,7 +226,7 @@ export default function AccountDashboard() {
   if (!user) {
     return (
       <main className="member-page">
-        <header className="trust-hero trust-hero-compact"><p className="eyebrow eyebrow-dark">✳ TON ESPACE O’BORD</p><h1>Retrouve ta place.</h1><p>Connecte-toi pour consulter tes informations et suivre tes demandes de réservation.</p></header>
+        <header className="trust-hero trust-hero-compact"><p className="eyebrow eyebrow-dark">TON ESPACE O’BORD</p><h1>Retrouve ta place.</h1><p>Connecte-toi pour consulter tes informations et suivre tes demandes de réservation.</p></header>
         <div className="trust-content"><section className="trust-card member-empty"><Link href="/login?next=%2Fmon-espace" className="button-primary">Me connecter <span aria-hidden="true">↗</span></Link><p>Pas encore de compte ? <Link href="/login?mode=signup">Créer mon compte</Link></p></section></div>
       </main>
     )
@@ -239,7 +239,7 @@ export default function AccountDashboard() {
 
   return (
     <main className="member-page">
-      <header className="trust-hero trust-hero-compact"><p className="eyebrow eyebrow-dark">✳ TON ESPACE O’BORD</p><h1>Bienvenue{fullName ? `, ${fullName.split(' ')[0]}` : ''}.</h1><p>Retrouve ici tes informations et le suivi de toutes tes demandes de rencontre.</p></header>
+      <header className="trust-hero trust-hero-compact"><p className="eyebrow eyebrow-dark">TON ESPACE O’BORD</p><h1>Bienvenue{fullName ? `, ${fullName.split(' ')[0]}` : ''}.</h1><p>Retrouve ici tes informations et le suivi de toutes tes demandes de rencontre.</p></header>
       <div className="trust-content member-content">
         <section className="member-summary" aria-label="Résumé de tes réservations">
           <article className="member-stat"><span>MES DEMANDES</span><strong>{reservations.length}</strong></article>
@@ -307,7 +307,7 @@ export default function AccountDashboard() {
                 ))}</>}
               </div>
             ) : (
-              <div className="trust-card member-empty"><span aria-hidden="true">✳</span><h3>Pas encore de rencontre réservée.</h3><p>Choisis une date dans l’agenda et retrouve ici le suivi de ta demande.</p><Link className="button-primary" href="/soirees">Découvrir les rencontres <span aria-hidden="true">↗</span></Link></div>
+              <div className="trust-card member-empty"><h3>Pas encore de rencontre réservée.</h3><p>Choisis une date dans l’agenda et retrouve ici le suivi de ta demande.</p><Link className="button-primary" href="/soirees">Découvrir les rencontres <span aria-hidden="true">↗</span></Link></div>
             )}
           </section>
         </div>

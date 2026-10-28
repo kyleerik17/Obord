@@ -25,14 +25,14 @@ export default async function BlogPage() {
             {posts.map((post) => (
               <article className="blog-card" key={post.id}>
                 <Link href={`/blog/${encodeURIComponent(post.slug)}`} className="blog-card-link" aria-label={`Lire l’article : ${post.title}`}>
-                  {post.coverImageUrl ? <img className="blog-card-cover" src={post.coverImageUrl} alt={`Miniature de l’article ${post.title}`} loading="lazy" /> : <div className="blog-card-placeholder" aria-hidden="true"><span>O’BORD</span><b>✳</b></div>}
+                  {post.coverImageUrl ? <img className="blog-card-cover" src={post.coverImageUrl} alt={`Miniature de l’article ${post.title}`} loading="lazy" /> : <div className="blog-card-placeholder" aria-hidden="true"><span>O’BORD</span></div>}
                   <div className="blog-card-copy"><time dateTime={post.published_at}>{formatDate(post.published_at)}</time><h3>{post.title}</h3><p>{post.excerpt}</p><span className="blog-read-link">Lire l’article</span></div>
                 </Link>
               </article>
             ))}
           </div>
         ) : (
-          <section className="blog-empty"><span aria-hidden="true">✳</span><h3>Le journal est encore en train de s’écrire.</h3><p>Les articles publiés par le collectif apparaîtront ici.</p></section>
+          <section className="blog-empty"><h3>Le journal est encore en train de s’écrire.</h3><p>Les articles publiés par le collectif apparaîtront ici.</p></section>
         )}
         <div className="blog-back"><Link href="/">Retour à l’accueil</Link></div>
       </section>

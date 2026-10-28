@@ -9,7 +9,7 @@ export default function ContactPage() {
   return (
     <div className="trust-page">
       <header className="trust-hero">
-        <p className="eyebrow eyebrow-dark">✳ ON EST À TON ÉCOUTE</p>
+        <p className="eyebrow eyebrow-dark">ON EST À TON ÉCOUTE</p>
         <h1>On se parle ?<br /><span>Avec plaisir.</span></h1>
         <p>Tu hésites à venir, tu veux en savoir plus ou simplement dire bonjour ? Écris-nous, on te répond avec plaisir.</p>
       </header>
@@ -19,11 +19,11 @@ export default function ContactPage() {
           <section className="trust-card contact-details">
             <p className="event-practical-label">LES COORDONNÉES</p>
             <h2>On fait connaissance ?</h2>
-            <a href="tel:+2250768963019"><span aria-hidden="true">⌕</span><span><small>Téléphone</small>+225 07 68 96 30 19</span></a>
-            <a href={whatsappHref} target="_blank" rel="noopener noreferrer"><span aria-hidden="true">✳</span><span><small>WhatsApp</small>Écrire au collectif</span></a>
-            <a href="mailto:angeerikkyle@gmail.com"><span aria-hidden="true">✉</span><span><small>E-mail</small>angeerikkyle@gmail.com</span></a>
-            <div className="contact-detail-static"><span aria-hidden="true">⌖</span><span><small>Ville</small>Grand-Bassam, Côte d’Ivoire</span></div>
-            <a href="https://www.tiktok.com/@obord_777" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">♪</span><span><small>TikTok</small>@obord_777</span></a>
+            <a href="tel:+2250768963019"><small>Téléphone</small>+225 07 68 96 30 19</a>
+            <a href={whatsappHref} target="_blank" rel="noopener noreferrer"><small>WhatsApp</small>Écrire au collectif</a>
+            <a href="mailto:angeerikkyle@gmail.com"><small>E-mail</small>angeerikkyle@gmail.com</a>
+            <div className="contact-detail-static"><small>Ville</small>Grand-Bassam, Côte d’Ivoire</div>
+            <a href="https://www.tiktok.com/@obord_777" target="_blank" rel="noopener noreferrer"><small>TikTok</small>@obord_777</a>
           </section>
           <ContactForm />
         </div>
