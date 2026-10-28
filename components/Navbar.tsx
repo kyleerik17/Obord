@@ -67,6 +67,7 @@ export default function Navbar() {
           <div className="hidden items-center space-x-7 md:flex">
             <Link href="/#ateliers" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">Ateliers</Link>
             <Link href="/a-propos" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">À propos</Link>
+            <Link href="/blog" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">Blog</Link>
             <Link href="/#agenda" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">Agenda</Link>
             <Link href="/contact" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">Contact</Link>
             {isSignedIn ? (
@@ -103,6 +104,7 @@ export default function Navbar() {
           <div className="px-2 pt-2 pb-3 space-y-1">
             <Link onClick={() => setIsOpen(false)} href="/#ateliers" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Ateliers</Link>
             <Link onClick={() => setIsOpen(false)} href="/a-propos" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">À propos</Link>
+            <Link onClick={() => setIsOpen(false)} href="/blog" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Blog</Link>
             <Link onClick={() => setIsOpen(false)} href="/#agenda" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Agenda</Link>
             <Link onClick={() => setIsOpen(false)} href="/contact" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Contact</Link>
             {isSignedIn ? (

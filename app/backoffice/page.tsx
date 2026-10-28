@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { pageMetadata } from '@/lib/metadata'
 import { saveReservationBirthYears, updateReservationDecision } from './actions'
 import EventPhotoManager from './EventPhotoManager'
+import BlogPostManager from './BlogPostManager'
 
 export const dynamic = 'force-dynamic'
 export const metadata = pageMetadata('Espace équipe', 'Espace privé de gestion des réservations O’BORD.')
@@ -69,6 +70,12 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
   const photoEvents = (photoEventsData ?? []) as unknown as Array<{ id: string; title: string; starts_at: string; image_paths: string[] }>
   const photoManagerSetupMissing = Boolean(photoEventsError)
 
+  const { data: blogPostsData, error: blogPostsError } = await supabase
+    .from('blog_posts')
+    .select('id,slug,title,status,cover_image_path,published_at')
+    .order('created_at', { ascending: false })
+  const blogPosts = (blogPostsData ?? []) as Array<{ id: string; slug: string; title: string; status: 'draft' | 'published'; cover_image_path: string | null; published_at: string | null }>
+
   const reservations = (data ?? []) as unknown as Reservation[]
   const pendingCount = reservations.filter((reservation) => reservation.reservation_status === 'pending').length
   const confirmedCount = reservations.filter((reservation) => reservation.reservation_status === 'confirmed').length
@@ -124,6 +131,7 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
         </section>}
 
         <EventPhotoManager initialEvents={photoEvents} setupMissing={photoManagerSetupMissing} />
+        <BlogPostManager initialPosts={blogPosts} setupMissing={Boolean(blogPostsError)} />
 
         {result && resultMessages[result] && <p className="backoffice-feedback" role="status">{resultMessages[result]}</p>}
         {error ? (

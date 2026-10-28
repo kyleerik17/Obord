@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 const quickLinks = [
   { href: '/a-propos', label: 'À propos' },
+  { href: '/blog', label: 'Le blog' },
   { href: '/#ateliers', label: 'Ateliers' },
   { href: '/soirees', label: 'Agenda' },
   { href: '/faq', label: 'Questions fréquentes' },

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getSupabaseBrowserClient } from '@/lib/supabase'
+import { STRONG_PASSWORD_HINT, STRONG_PASSWORD_PATTERN } from '@/lib/auth/password'
 
 export default function Login() {
   const router = useRouter()
@@ -20,6 +21,10 @@ export default function Login() {
     e.preventDefault()
     setError('')
     setMessage('')
+    if (mode === 'signup' && !STRONG_PASSWORD_PATTERN.test(password)) {
+      setError(`Choisis un mot de passe plus robuste : ${STRONG_PASSWORD_HINT}`)
+      return
+    }
     setIsSubmitting(true)
 
     try {
@@ -135,12 +140,16 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete={isLogin ? 'current-password' : 'new-password'}
-                minLength={isLogin ? undefined : 10}
+                minLength={isLogin ? undefined : 12}
                 maxLength={128}
+                pattern={isLogin ? undefined : STRONG_PASSWORD_PATTERN.source}
+                title={isLogin ? undefined : STRONG_PASSWORD_HINT}
+                aria-describedby={isLogin ? undefined : 'password-strength-help'}
                 className="font-inter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition"
                 placeholder="••••••••"
                 required
               />
+              {mode === 'signup' && <p id="password-strength-help" className="mt-2 text-xs leading-relaxed text-gray-600">{STRONG_PASSWORD_HINT}</p>}
             </div>
           )}
 
