@@ -2,29 +2,21 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { pageMetadata } from '@/lib/metadata'
-import { saveReservationBirthYears, updateReservationDecision, updateWaitlistStatus } from './actions'
+import { updateWaitlistStatus, markContactMessageRead } from './actions'
 import EventPhotoManager from './EventPhotoManager'
 import BlogPostManager from './BlogPostManager'
 import EventManager, { type ManagedEventRecord } from './EventManager'
-import { maximumBirthYearForEvent } from '@/lib/age'
+import ReservationInbox, { type ReservationInboxItem } from './ReservationInbox'
+import TeamNotifications from './TeamNotifications'
+import TeamIcebreaker from './TeamIcebreaker'
 
 export const dynamic = 'force-dynamic'
 export const metadata = pageMetadata('Espace équipe', 'Espace privé de gestion des réservations O’BORD.')
 
-type Reservation = {
-  id: string
-  event_id: string
-  attendance_type: 'solo' | 'group'
-  contact_name: string
-  contact_email: string
-  contact_phone: string | null
-  group_size: number
-  attendee_birth_years: number[] | null
-  reservation_status: 'pending' | 'confirmed' | 'declined' | 'cancelled'
-  message: string | null
-  created_at: string
-  event: { title: string; starts_at: string; venue_area: string }
-}
+type Reservation = ReservationInboxItem
+
+type ContactMessage = { id: string; name: string; email: string; subject: string | null; body: string; created_at: string; read_at: string | null }
+type ReservationAudit = { id: number; registration_id: string | null; actor_id: string | null; actor_email: string | null; action: 'created' | 'status_changed' | 'details_changed'; previous_status: string | null; next_status: string | null; previous_group_size: number | null; next_group_size: number | null; created_at: string; event: { title: string } | null }
 
 type WaitlistRequest = {
   id: string
@@ -38,25 +30,12 @@ type WaitlistRequest = {
   event: { title: string; starts_at: string; venue_area: string }
 }
 
-const reservationStatusLabels: Record<Reservation['reservation_status'], string> = {
-  pending: 'En attente',
-  confirmed: 'Réservation confirmée',
-  declined: 'Refusée',
-  cancelled: 'Annulée',
-}
-
 function formatDate(value: string) {
   return new Intl.DateTimeFormat('fr-FR', {
     dateStyle: 'long',
     timeStyle: 'short',
     timeZone: 'Africa/Abidjan',
   }).format(new Date(value))
-}
-
-function whatsappLink(phone: string | null, message: string) {
-  const digits = phone?.replace(/\D/g, '')
-  const international = digits ? digits.startsWith('225') ? digits : digits.startsWith('0') ? `225${digits.slice(1)}` : `225${digits}` : '2250768963019'
-  return `https://wa.me/${international}?text=${encodeURIComponent(message)}`
 }
 
 export default async function BackofficePage({ searchParams }: { searchParams: Promise<{ result?: string }> }) {
@@ -108,10 +87,24 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
     .order('created_at', { ascending: false })
   const blogPosts = (blogPostsData ?? []) as Array<{ id: string; slug: string; title: string; status: 'draft' | 'published'; cover_image_path: string | null; published_at: string | null }>
 
+  const { data: contactMessagesData, error: contactMessagesError } = await supabase
+    .from('contact_messages')
+    .select('id,name,email,subject,body,created_at,read_at')
+    .order('created_at', { ascending: false })
+    .limit(100)
+  const contactMessages = (contactMessagesData ?? []) as ContactMessage[]
+  const { data: auditData, error: auditError } = await supabase
+    .from('event_registration_audit')
+    .select('id,registration_id,actor_id,actor_email,action,previous_status,next_status,previous_group_size,next_group_size,created_at,event:events(title)')
+    .order('created_at', { ascending: false })
+    .limit(50)
+  const auditEntries = (auditData ?? []) as unknown as ReservationAudit[]
+
   const reservations = (data ?? []) as unknown as Reservation[]
   const activeWaitlist = (waitlistData ?? []) as unknown as WaitlistRequest[]
   const pendingCount = reservations.filter((reservation) => reservation.reservation_status === 'pending').length
   const confirmedCount = reservations.filter((reservation) => reservation.reservation_status === 'confirmed').length
+  const unreadMessages = contactMessages.filter((message) => !message.read_at).length
   const eventStats = new Map<string, { title: string; startsAt: string; requests: number; pending: number; confirmed: number; booked: number; capacity: number | null; externalReserved: number }>()
   for (const event of managedEvents) {
     eventStats.set(event.id, {
@@ -157,6 +150,9 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
     'waitlist-error': 'Le statut de la demande n’a pas pu être enregistré. Vérifie la configuration Supabase.',
     'waitlist-stale': 'Cette demande a déjà été traitée ou retirée.',
     'waitlist-contacted': 'La demande est marquée comme contactée.',
+    'message-invalid': 'Le message sélectionné est invalide.',
+    'message-error': 'Le message n’a pas pu être marqué comme lu. Vérifie le script SQL de la boîte équipe.',
+    'message-read': 'Message marqué comme lu.',
   }
 
   return (
@@ -168,30 +164,49 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
       </header>
 
       <div className="trust-content">
-        <div className="backoffice-summary" aria-label="Résumé des réservations">
+        <nav className="backoffice-category-nav" aria-label="Catégories du back-office">
+          <a href="#overview">Vue d’ensemble</a>
+          <a href="#events">Rencontres</a>
+          <a href="#waitlist">Liste d’attente</a>
+        <a href="#messages">Messages</a>
+          <a href="#reservations">Réservations</a>
+        <a href="#history">Historique</a>
+          <a href="#photos">Photos</a>
+          <a href="#blog">Blog</a>
+        </nav>
+
+        <section className="backoffice-category-card" id="overview" aria-labelledby="backoffice-overview-title">
+          <header className="backoffice-category-heading"><p className="event-practical-label">VUE D’ENSEMBLE</p><h2 id="backoffice-overview-title">L’activité de l’équipe</h2><p>Les chiffres clés et les demandes à suivre.</p></header>
+          <div className="backoffice-summary" aria-label="Résumé des réservations">
           <div className="backoffice-summary-card"><span>Demandes totales</span><strong>{reservations.length}</strong></div>
           <div className="backoffice-summary-card"><span>À traiter</span><strong>{pendingCount}</strong></div>
           <div className="backoffice-summary-card"><span>Confirmées</span><strong>{confirmedCount}</strong></div>
           <div className="backoffice-summary-card"><span>En liste d’attente</span><strong>{activeWaitlist.length}</strong></div>
-        </div>
+          </div>
+          <TeamNotifications pendingReservations={pendingCount} unreadMessages={unreadMessages} />
+          <TeamIcebreaker />
+        </section>
 
-        {eventStats.size > 0 && <section className="backoffice-event-stats" aria-labelledby="backoffice-event-stats-title">
+        <section className="backoffice-category-card" id="events" aria-labelledby="backoffice-events-title">
+          <header className="backoffice-category-heading"><p className="event-practical-label">PROGRAMMATION</p><h2 id="backoffice-events-title">Rencontres & plans</h2><p>Crée les rencontres, suis les inscriptions et prépare les prochaines dates.</p></header>
+          {eventStats.size > 0 && <section className="backoffice-event-stats" aria-labelledby="backoffice-event-stats-title">
           <div className="backoffice-section-heading"><p className="event-practical-label">ACTIVITÉ DES RENCONTRES</p><h2 id="backoffice-event-stats-title">Les chiffres, rencontre par rencontre.</h2></div>
           <div className="backoffice-event-grid">{Array.from(eventStats.entries()).map(([eventId, stats]) => <article className="backoffice-event-card" key={eventId}>
             <h3>{stats.title}</h3><p className="backoffice-event-date">{formatDate(stats.startsAt)}</p>
             <div><span>Demandes <strong>{stats.requests}</strong></span><span>À traiter <strong>{stats.pending}</strong></span><span>Confirmées <strong>{stats.confirmed}</strong></span>{stats.capacity !== null && <span>Places prises <strong>{Math.min(stats.capacity, stats.booked + stats.externalReserved)} / {stats.capacity}</strong></span>}</div>
           </article>)}</div>
         </section>}
-
         <EventManager events={managedEvents} setupMissing={Boolean(managedEventsError)} />
-        <EventPhotoManager initialEvents={photoEvents} setupMissing={photoManagerSetupMissing} />
-        <BlogPostManager initialPosts={blogPosts} setupMissing={Boolean(blogPostsError)} />
+        </section>
 
-        <section className="backoffice-waitlist" aria-labelledby="backoffice-waitlist-title">
+        <section className="backoffice-category-card" id="waitlist" aria-labelledby="backoffice-waitlist-title">
+          <section className="backoffice-waitlist" aria-labelledby="backoffice-waitlist-title">
           <header><p className="event-practical-label">PLACES LIBÉRÉES</p><h2 id="backoffice-waitlist-title">Liste d’attente</h2><p>Contacte les personnes dans l’ordre d’arrivée quand une place devient disponible.</p></header>
           {waitlistError ? <p className="backoffice-feedback" role="status">La liste d’attente n’est pas encore configurée. Applique <code>supabase/obord_event_management_waitlist.sql</code>.</p> : (waitlistData as unknown as WaitlistRequest[] | null)?.length ? <div className="backoffice-waitlist-list">{(waitlistData as unknown as WaitlistRequest[]).map((request) => {
             const whatsappMessage = `Bonjour ${request.contact_name}, une place vient de se libérer pour ${request.event.title} le ${new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Africa/Abidjan' }).format(new Date(request.event.starts_at))}. Réponds-nous pour confirmer si tu souhaites toujours venir.`
-            const contactUrl = request.contact_phone ? whatsappLink(request.contact_phone, whatsappMessage) : `mailto:${encodeURIComponent(request.contact_email)}?subject=${encodeURIComponent('Une place se libère · O’BORD')}&body=${encodeURIComponent(whatsappMessage)}`
+            const digits = request.contact_phone?.replace(/\D/g, '')
+            const international = digits ? digits.startsWith('225') ? digits : digits.startsWith('0') ? `225${digits.slice(1)}` : `225${digits}` : ''
+            const contactUrl = request.contact_phone && international ? `https://wa.me/${international}?text=${encodeURIComponent(whatsappMessage)}` : `mailto:${encodeURIComponent(request.contact_email)}?subject=${encodeURIComponent('Une place se libère · O’BORD')}&body=${encodeURIComponent(whatsappMessage)}`
             return <article className="backoffice-waitlist-item" key={request.id}>
               <div><span className="backoffice-status">{request.status === 'waiting' ? 'En attente' : 'Contactée'}</span><h3>{request.contact_name} · {request.group_size} personne{request.group_size > 1 ? 's' : ''}</h3><p>{request.event.title} · {formatDate(request.event.starts_at)}</p><p>{request.contact_email}{request.contact_phone ? ` · ${request.contact_phone}` : ''}</p><small>Demande reçue le {formatDate(request.created_at)}</small></div>
               <div className="backoffice-waitlist-actions"><a href={contactUrl} {...(request.contact_phone ? { target: '_blank', rel: 'noreferrer' } : {})}>Contacter par {request.contact_phone ? 'WhatsApp' : 'e-mail'}</a>{request.status === 'waiting' && <form action={updateWaitlistStatus}><input type="hidden" name="waitlistId" value={request.id} /><button type="submit">Marquer contactée</button></form>}</div>
@@ -199,44 +214,43 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
           })}</div> : <p className="backoffice-empty-copy">Aucune demande sur liste d’attente pour l’instant.</p>}
         </section>
 
+        </section>
+
+        <section className="backoffice-category-card" id="messages" aria-labelledby="backoffice-messages-title">
+          <header className="backoffice-category-heading"><p className="event-practical-label">BOÎTE DE L’ÉQUIPE</p><h2 id="backoffice-messages-title">Messages reçus <span className="backoffice-category-count">{unreadMessages} non lus</span></h2><p>Les messages envoyés depuis la page Contact arrivent ici.</p></header>
+          {contactMessagesError ? <p className="backoffice-feedback" role="status">La boîte de messages n’est pas configurée. Applique <code>supabase/obord_team_inbox_audit.sql</code>.</p> : contactMessages.length ? <div className="team-message-list">{contactMessages.map((message) => <article className={`team-message-card${message.read_at ? '' : ' is-unread'}`} key={message.id}>
+            <div className="team-message-heading"><div><span className="team-message-status">{message.read_at ? 'Lu' : 'Nouveau'}</span><h3>{message.subject || 'Message sans sujet'}</h3></div><time dateTime={message.created_at}>{formatDate(message.created_at)}</time></div>
+            <p className="team-message-sender">{message.name} · <a href={`mailto:${message.email}`}>{message.email}</a></p><p className="team-message-body">{message.body}</p>
+            {!message.read_at && <form action={markContactMessageRead}><input type="hidden" name="messageId" value={message.id} /><button type="submit" className="team-message-read-button">Marquer comme lu</button></form>}
+          </article>)}</div> : <p className="backoffice-empty-copy">Aucun message reçu pour le moment.</p>}
+        </section>
+
+        <section className="backoffice-category-card" id="reservations" aria-labelledby="backoffice-reservations-title">
+        <header className="backoffice-category-heading"><p className="event-practical-label">BOÎTE DE RÉCEPTION</p><h2 id="backoffice-reservations-title">Demandes de réservation <span className="backoffice-category-count">{reservations.length}</span></h2><p>Vérifie les informations, puis confirme ou refuse chaque demande.</p></header>
         {result && resultMessages[result] && <p className="backoffice-feedback" role="status">{resultMessages[result]}</p>}
         {error ? (
           <section className="trust-card"><h2>Les demandes ne sont pas accessibles.</h2><p>Vérifie que le script SQL du back-office a été exécuté dans Supabase et que le rôle organisateur est actif sur ce compte.</p></section>
         ) : reservations.length === 0 ? (
           <section className="trust-card backoffice-empty"><h2>Aucune réservation pour le moment.</h2><p>Les demandes envoyées depuis la page des rencontres apparaîtront ici.</p></section>
-        ) : (
-          <div className="backoffice-list">
-            {reservations.map((reservation) => (
-              <article className="trust-card backoffice-reservation" key={reservation.id}>
-                <div className="backoffice-reservation-heading">
-                  <div><p className="event-practical-label">{reservation.event.title}</p><h2>{reservation.contact_name}</h2></div>
-                  <span className={`backoffice-status status-${reservation.reservation_status}`}>{reservationStatusLabels[reservation.reservation_status]}</span>
-                </div>
-                <div className="backoffice-details">
-                  <p><strong>Rencontre</strong><span>{formatDate(reservation.event.starts_at)}</span></p>
-                  <p><strong>Inscription</strong><span>{reservation.attendance_type === 'solo' ? 'Solo' : `Groupe · ${reservation.group_size} personnes`}</span></p>
-                  <p><strong>Demande reçue</strong><span>{formatDate(reservation.created_at)}</span></p>
-                  <p><strong>Contact</strong><span><a href={`mailto:${reservation.contact_email}`}>{reservation.contact_email}</a>{reservation.contact_phone && <> · <a href={`tel:${reservation.contact_phone.replace(/[^+\d]/g, '')}`}>{reservation.contact_phone}</a></>}</span></p>
-                </div>
-                <div className="backoffice-ages"><strong>Années de naissance</strong>{reservation.attendee_birth_years?.length === reservation.group_size ? <ol>{reservation.attendee_birth_years.map((year, index) => <li key={`${reservation.id}-birth-year-${index}`}>Personne {index + 1} · {year}</li>)}</ol> : reservation.reservation_status === 'pending' ? <><p>Années manquantes pour cette ancienne demande. Contacte la personne, puis enregistre l’année de naissance de chaque participant.</p><form action={saveReservationBirthYears} className="backoffice-age-form"><input type="hidden" name="registrationId" value={reservation.id} />{Array.from({ length: reservation.group_size }, (_, index) => <label key={index}>Personne {index + 1}<input aria-label={`Année de naissance de la personne ${index + 1}`} name="attendeeBirthYear" type="number" min={1900} max={maximumBirthYearForEvent(reservation.event.starts_at)} step={1} required /></label>)}<button className="button-primary" type="submit">Enregistrer les années</button></form></> : <p>Années de naissance non collectées sur cette ancienne demande.</p>}</div>
-                {reservation.message && <div className="backoffice-message"><strong>Mot laissé à l’équipe</strong><p>{reservation.message}</p></div>}
-                <div className="backoffice-actions">
-                  {reservation.reservation_status === 'confirmed' && (() => {
-                    const message = `Bonjour ${reservation.contact_name}, ta réservation pour ${reservation.event.title} le ${formatDate(reservation.event.starts_at)} est confirmée. Le rendez-vous est à ${reservation.event.venue_area}. À très bientôt avec O’BORD !`
-                    const href = reservation.contact_phone ? whatsappLink(reservation.contact_phone, message) : `mailto:${encodeURIComponent(reservation.contact_email)}?subject=${encodeURIComponent('Réservation confirmée · O’BORD')}&body=${encodeURIComponent(message)}`
-                    return <a className="backoffice-confirmation-link" {...(reservation.contact_phone ? { target: '_blank', rel: 'noreferrer' } : {})} href={href}>Envoyer la confirmation par {reservation.contact_phone ? 'WhatsApp' : 'e-mail'}</a>
-                  })()}
-                  {reservation.reservation_status === 'pending' && reservation.attendee_birth_years?.length === reservation.group_size && (
-                    <div className="backoffice-decision-actions">
-                      <form action={updateReservationDecision}><input type="hidden" name="registrationId" value={reservation.id} /><input type="hidden" name="decision" value="confirmed" /><button className="button-primary" type="submit">Confirmer la réservation <span aria-hidden="true">↗</span></button></form>
-                      <form action={updateReservationDecision}><input type="hidden" name="registrationId" value={reservation.id} /><input type="hidden" name="decision" value="declined" /><button className="backoffice-decline" type="submit">Refuser la demande</button></form>
-                    </div>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
+        ) : <ReservationInbox reservations={reservations} />}
+        </section>
+
+        <section className="backoffice-category-card" id="history" aria-labelledby="backoffice-history-title">
+          <header className="backoffice-category-heading"><p className="event-practical-label">TRACE DES ACTIONS</p><h2 id="backoffice-history-title">Historique des réservations</h2><p>Les décisions et changements sont associés au compte qui les a effectués.</p></header>
+          {auditError ? <p className="backoffice-feedback" role="status">L’historique n’est pas encore configuré. Applique <code>supabase/obord_team_inbox_audit.sql</code>.</p> : auditEntries.length ? <ol className="team-audit-list">{auditEntries.map((entry) => <li key={entry.id}>
+            <span className="team-audit-mark" aria-hidden="true">✳</span><div><strong>{entry.action === 'created' ? 'Demande reçue' : entry.action === 'status_changed' ? `Statut : ${entry.previous_status ?? '—'} → ${entry.next_status ?? '—'}` : 'Inscription modifiée'}</strong><p>{entry.event?.title ?? 'Rencontre'} · {entry.actor_email ?? 'Compte supprimé'} · {formatDate(entry.created_at)}</p></div>
+          </li>)}</ol> : <p className="backoffice-empty-copy">Les prochains changements apparaîtront ici après l’installation du journal.</p>}
+        </section>
+
+        <section className="backoffice-category-card" id="photos" aria-labelledby="backoffice-photos-title">
+          <header className="backoffice-category-heading"><p className="event-practical-label">SOUVENIRS</p><h2 id="backoffice-photos-title">Photos des rencontres</h2><p>Ajoute ou retire les images associées aux plans publiés. Partage uniquement des photos que le collectif est autorisé à diffuser et vérifie l’accord des personnes reconnaissables.</p></header>
+          <EventPhotoManager initialEvents={photoEvents} setupMissing={photoManagerSetupMissing} />
+        </section>
+
+        <section className="backoffice-category-card" id="blog" aria-labelledby="backoffice-blog-title">
+          <header className="backoffice-category-heading"><p className="event-practical-label">LE JOURNAL</p><h2 id="backoffice-blog-title">Articles du collectif</h2><p>Rédige et gère les contenus du blog O’BORD.</p></header>
+          <BlogPostManager initialPosts={blogPosts} setupMissing={Boolean(blogPostsError)} />
+        </section>
       </div>
     </div>
   )

@@ -190,3 +190,21 @@ export async function updateWaitlistStatus(formData: FormData) {
   revalidatePath('/mon-espace')
   redirect('/backoffice?result=waitlist-contacted')
 }
+
+export async function markContactMessageRead(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login?next=%2Fbackoffice')
+  if (user.app_metadata?.role !== 'organizer') redirect('/backoffice?result=forbidden')
+
+  const messageId = String(formData.get('messageId') ?? '')
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(messageId)) {
+    redirect('/backoffice?result=message-invalid')
+  }
+  const { error } = await supabase.from('contact_messages')
+    .update({ read_at: new Date().toISOString(), read_by: user.id })
+    .eq('id', messageId).is('read_at', null)
+  if (error) redirect('/backoffice?result=message-error')
+  revalidatePath('/backoffice')
+  redirect('/backoffice?result=message-read')
+}

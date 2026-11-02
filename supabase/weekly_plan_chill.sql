@@ -11,6 +11,8 @@ create extension if not exists pg_cron;
 
 update public.events
 set venue_area = 'Quartier France, Grand-Bassam',
+    venue_name = 'Bamboo Blanc',
+    venue_details = 'Point de rendez-vous : Bamboo Blanc, quartier France, Grand-Bassam.',
     participation_details = '3 000 FCFA par personne',
     food_and_drinks = case
       when food_and_drinks ~* '(bouteille|vodka|liqueur|alcool)' then null
@@ -64,6 +66,8 @@ begin
   -- Keep an existing Plan chill (including a manually seeded one) and correct its venue.
   update public.events
   set venue_area = 'Quartier France, Grand-Bassam',
+      venue_name = 'Bamboo Blanc',
+      venue_details = 'Point de rendez-vous : Bamboo Blanc, quartier France, Grand-Bassam.',
       participation_details = '3 000 FCFA par personne',
       food_and_drinks = case
         when food_and_drinks ~* '(bouteille|vodka|liqueur|alcool)' then null
@@ -95,8 +99,8 @@ begin
     plan_start,
     'Un après-midi chill pour se retrouver. Le programme détaillé sera précisé par l’équipe O’BORD.',
     'Quartier France, Grand-Bassam',
-    null,
-    'Le point de rencontre précis sera communiqué après confirmation de la réservation.',
+    'Bamboo Blanc',
+    'Point de rendez-vous : Bamboo Blanc, quartier France, Grand-Bassam.',
     '3 000 FCFA par personne',
     'published'
   )

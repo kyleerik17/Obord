@@ -122,7 +122,7 @@ export default function EventPhotoManager({ initialEvents, setupMissing = false 
 
   return (
     <section className="backoffice-photo-manager" aria-labelledby="event-photo-manager-title">
-      <header><p className="event-practical-label">PHOTOS DES RENCONTRES</p><h2 id="event-photo-manager-title">Fais découvrir l’ambiance.</h2><p>Ajoute jusqu’à six photos réelles par plan. Elles seront visibles sur la page publique de la rencontre.</p></header>
+      <header><p className="event-practical-label">PHOTOS DES RENCONTRES</p><h2 id="event-photo-manager-title">Fais découvrir l’ambiance.</h2><p>Ajoute jusqu’à six photos réelles par plan. Elles seront visibles publiquement. Publie uniquement des images que le collectif est autorisé à partager et vérifie l’accord des personnes reconnaissables.</p></header>
       {setupMissing ? <p className="backoffice-feedback" role="status">Le stockage des photos n’est pas configuré. Applique <code>supabase/obord_capacity_member_edits_event_photos.sql</code> dans Supabase.</p> : events.length ? <div className="backoffice-photo-events">{events.map((event) => {
         const supabase = getSupabaseBrowserClient()
         return <article className="backoffice-photo-event" key={event.id}>

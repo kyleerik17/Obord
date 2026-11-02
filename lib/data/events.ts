@@ -104,7 +104,7 @@ export async function getUpcomingEvents(): Promise<UpcomingEventsResult> {
         time: formatTime(row.starts_at),
         endsAt: row.ends_at,
         description: row.description,
-        venueName: row.venue_name ?? 'Lieu précis communiqué après confirmation',
+        venueName: row.venue_name ?? 'Bamboo Blanc',
         venueArea: row.venue_area,
         capacity: row.capacity,
         reservedCount: availabilityByEvent.get(row.id)?.reserved_count ?? null,

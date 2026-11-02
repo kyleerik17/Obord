@@ -29,8 +29,8 @@ export default function ContactPage() {
         </div>
 
         <section className="trust-card map-card">
-          <div><p className="event-practical-label">NOTRE VILLE</p><h2>Grand-Bassam, Côte d’Ivoire</h2><p>Le point précis de rencontre est communiqué après confirmation de la réservation.</p></div>
-          <iframe title="Carte Google Maps de Grand-Bassam, Côte d’Ivoire" src="https://www.google.com/maps?q=Grand-Bassam%2C%20C%C3%B4te%20d%27Ivoire&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+          <div><p className="event-practical-label">POINT DE RENDEZ-VOUS</p><h2>Bamboo Blanc, quartier France</h2><p>Grand-Bassam, Côte d’Ivoire. Les informations propres à chaque rencontre restent précisées sur sa fiche.</p><a className="button-primary" href="https://www.google.com/maps/search/?api=1&query=Bamboo+Blanc%2C+Quartier+France%2C+Grand-Bassam" target="_blank" rel="noopener noreferrer">Ouvrir dans Google Maps <span aria-hidden="true">↗</span></a></div>
+          <iframe title="Carte Google Maps de Bamboo Blanc, quartier France, Grand-Bassam" src="https://www.google.com/maps?q=Bamboo+Blanc%2C+Quartier+France%2C+Grand-Bassam&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
         </section>
       </div>
     </div>

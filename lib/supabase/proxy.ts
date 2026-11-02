@@ -21,7 +21,7 @@ function createContentSecurityPolicy(nonce: string) {
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDevelopment ? " 'unsafe-eval'" : ''}`,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob:",
+    `img-src 'self' data: blob: ${supabaseOrigin}`,
     "font-src 'self'",
     `connect-src 'self' ${supabaseOrigin} ${supabaseSocketOrigin}`,
     "frame-src https://www.google.com https://maps.google.com",

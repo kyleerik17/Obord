@@ -34,8 +34,8 @@ function EventFields({ event }: { event?: ManagedEventRecord }) {
       <label>Heure de début<input name="startTime" type="time" required defaultValue={inputTime(event?.starts_at ?? null)} /></label>
       <label>Date de fin (facultative)<input name="endDate" type="date" defaultValue={inputDate(event?.ends_at ?? null)} /></label>
       <label>Heure de fin (facultative)<input name="endTime" type="time" defaultValue={inputTime(event?.ends_at ?? null)} /></label>
-      <label>Quartier / secteur<input name="venueArea" required maxLength={120} defaultValue={event?.venue_area} /></label>
-      <label>Lieu précis (facultatif)<input name="venueName" maxLength={200} defaultValue={event?.venue_name ?? ''} /></label>
+      <label>Quartier / secteur<input name="venueArea" required maxLength={120} defaultValue={event?.venue_area ?? 'Quartier France, Grand-Bassam'} /></label>
+      <label>Lieu précis (facultatif)<input name="venueName" maxLength={200} defaultValue={event?.venue_name ?? 'Bamboo Blanc'} /></label>
       <label>Capacité (facultative)<input name="capacity" type="number" min={1} max={10000} defaultValue={event?.capacity ?? ''} /></label>
       <label>Places déjà prises sur Tikko / ailleurs<input name="externalReservedCount" type="number" min={0} max={10000} defaultValue={event?.external_reserved_count ?? 0} /><small>À mettre à jour manuellement tant qu’aucune synchronisation Tikko n’est disponible.</small></label>
       <label>Lien d’inscription Tikko (facultatif)<input name="externalRegistrationUrl" type="url" maxLength={500} defaultValue={event?.external_registration_url ?? ''} placeholder="https://tikko.ci/register/…" /><small>Colle le lien de billetterie correspondant à cette rencontre. Il sera ouvert depuis sa fiche.</small></label>

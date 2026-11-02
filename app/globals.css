@@ -1133,6 +1133,88 @@ body:has(.ob-home) nav[aria-label="Navigation principale"] #mobile-navigation a:
   .video-page .soirees-hero { min-height: 540px; }
 }
 
+/* Back-office : une carte identifiable par domaine de gestion. */
+.backoffice-category-nav { position: sticky; z-index: 5; top: 12px; display: flex; gap: 8px; overflow-x: auto; margin: 0 0 18px; padding: 9px; border: 1px solid #e4e0ef; border-radius: 12px; background: #ffffffed; box-shadow: 0 8px 24px #211e2c0d; scrollbar-width: thin; }
+.backoffice-category-nav a { flex: none; padding: 10px 13px; border-radius: 8px; color: #514d5e; font-size: 12px; font-weight: 800; text-decoration: none; transition: background .2s ease, color .2s ease; }
+.backoffice-category-nav a:hover, .backoffice-category-nav a:focus-visible { background: #eeeaff; color: #51479b; outline: none; }
+.backoffice-category-card { scroll-margin-top: 84px; margin: 0 0 18px; padding: clamp(18px, 3vw, 28px); border: 1px solid #e4e0ef; border-radius: 13px; background: #fff; box-shadow: 0 10px 30px #211e2c08; }
+.backoffice-category-heading { margin-bottom: 19px; }
+.backoffice-category-heading .event-practical-label { margin: 0 0 7px; color: #51479b; font-size: 10px; font-weight: 900; letter-spacing: .11em; }
+.backoffice-category-heading h2 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0; color: #282438; font-family: var(--font-space), sans-serif; font-size: clamp(22px, 3.6vw, 30px); letter-spacing: -.05em; }
+.backoffice-category-heading > p:last-child { margin: 7px 0 0; color: #625d71; font-size: 13px; line-height: 1.65; }
+.backoffice-category-count { display: inline-grid; min-width: 29px; height: 29px; place-items: center; padding: 0 8px; border-radius: 999px; background: #eeeaff; color: #51479b; font-family: var(--font-display), sans-serif; font-size: 12px; letter-spacing: 0; }
+.backoffice-category-card .backoffice-summary { margin: 0; }
+.backoffice-category-card .backoffice-event-stats { margin: 0 0 20px; }
+.backoffice-category-card > .event-admin-manager,
+.backoffice-category-card > .backoffice-waitlist,
+.backoffice-category-card > .backoffice-photo-manager,
+.backoffice-category-card > .blog-admin-manager { margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.backoffice-category-card > .event-admin-manager > header,
+.backoffice-category-card > .backoffice-waitlist > header,
+.backoffice-category-card > .backoffice-photo-manager > header,
+.backoffice-category-card > .blog-admin-manager > header { display: none; }
+.backoffice-category-card > .backoffice-waitlist { display: block; }
+.backoffice-category-card > .backoffice-feedback:last-child { margin-bottom: 0; }
+.reservation-filter-bar { display: grid; grid-template-columns: minmax(200px, 1.5fr) repeat(3, minmax(145px, 1fr)) auto; align-items: end; gap: 10px; margin: 0 0 10px; padding: 15px; border: 1px solid #e7e3ef; border-radius: 10px; background: #faf9fc; }
+.reservation-filter-bar label { display: grid; min-width: 0; gap: 5px; color: #514d5e; font-size: 10px; font-weight: 800; }
+.reservation-filter-bar input, .reservation-filter-bar select { width: 100%; min-width: 0; min-height: 42px; padding: 9px 10px; border: 1px solid #dcd7e7; border-radius: 7px; background: #fff; color: #282438; font: inherit; font-size: 12px; }
+.reservation-filter-bar input:focus, .reservation-filter-bar select:focus { border-color: #6c5ce7; outline: 3px solid #6c5ce722; }
+.reservation-filter-reset { min-height: 42px; padding: 0 12px; border: 1px solid #dcd7e7; border-radius: 7px; background: #fff; color: #51479b; cursor: pointer; font-size: 11px; font-weight: 800; }
+.reservation-filter-count { margin: 0 0 10px; color: #625d71; font-size: 11px; }
+.team-notifications { display: flex; align-items: center; justify-content: space-between; gap: 13px; margin-top: 15px; padding: 14px; border: 1px solid #ded8f7; border-radius: 10px; background: linear-gradient(110deg, #f5f2ff, #fff8ed); }
+.team-notification-summary { display: flex; min-width: 0; align-items: center; gap: 11px; }
+.team-notification-icon, .team-icebreaker-icon { display: grid; width: 39px; height: 39px; flex: none; place-items: center; border-radius: 50%; background: #6c5ce7; color: #fff; font-size: 19px; }
+.team-notification-summary strong { color: #282438; font-size: 12px; }
+.team-notification-summary p { margin: 3px 0 0; color: #625d71; font-size: 11px; line-height: 1.5; }
+.team-sound-toggle, .team-icebreaker button { flex: none; min-height: 38px; padding: 0 12px; border: 1px solid #d8d1f0; border-radius: 7px; background: #fff; color: #51479b; cursor: pointer; font-size: 10px; font-weight: 800; transition: transform .2s ease, box-shadow .2s ease; }
+.team-sound-toggle:hover, .team-icebreaker button:hover { transform: translateY(-2px); box-shadow: 0 5px 14px #30226214; }
+.team-live-toast { position: fixed; z-index: 80; right: 18px; bottom: 18px; max-width: min(420px, calc(100vw - 36px)); margin: 0; padding: 15px 18px; border: 1px solid #d8d1f0; border-radius: 11px; background: #2d2a4a; box-shadow: 0 14px 40px #17142540; color: #fff; font-size: 13px; animation: team-toast-in .35s ease both; }
+@keyframes team-toast-in { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.team-icebreaker { display: flex; align-items: center; gap: 13px; margin-top: 12px; padding: 14px; border: 1px solid #f0dfb7; border-radius: 10px; background: #fffaf0; }
+.team-icebreaker-icon { background: #fdcb6e; color: #47371b; }
+.team-icebreaker > div { min-width: 0; flex: 1; }
+.team-icebreaker .event-practical-label { margin: 0 0 4px; color: #96702c; font-size: 9px; font-weight: 900; letter-spacing: .1em; }
+.team-icebreaker h3 { margin: 0; color: #302c3d; font-family: var(--font-space), sans-serif; font-size: 15px; }
+.team-icebreaker > div > p:last-child { margin: 4px 0 0; color: #625d71; font-size: 10px; }
+.team-message-list { display: grid; gap: 11px; }
+.team-message-card { padding: 16px; border: 1px solid #e4e0ef; border-radius: 9px; background: #fff; }
+.team-message-card.is-unread { border-color: #b8aef1; background: #fbfaff; box-shadow: inset 3px 0 #6c5ce7; }
+.team-message-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.team-message-heading h3 { margin: 6px 0 0; color: #282438; font-family: var(--font-space), sans-serif; font-size: 16px; }
+.team-message-heading time { flex: none; color: #625d71; font-size: 10px; }
+.team-message-status { color: #51479b; font-size: 9px; font-weight: 900; text-transform: uppercase; }
+.team-message-sender { margin: 9px 0; color: #514d5e; font-size: 11px; }
+.team-message-sender a { color: #51479b; text-decoration: underline; text-underline-offset: 2px; }
+.team-message-body { margin: 0; color: #302c3d; font-size: 12px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.team-message-read-button { margin-top: 12px; padding: 8px 11px; border: 1px solid #dcd7e7; border-radius: 6px; background: white; color: #51479b; cursor: pointer; font-size: 10px; font-weight: 800; }
+.team-audit-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.team-audit-list li { display: flex; align-items: flex-start; gap: 11px; padding: 13px 0; border-bottom: 1px solid #eeeaf5; }
+.team-audit-list li:last-child { border-bottom: 0; }
+.team-audit-mark { display: grid; width: 29px; height: 29px; flex: none; place-items: center; border-radius: 50%; background: #eeeaff; color: #51479b; }
+.team-audit-list strong { color: #302c3d; font-size: 12px; }
+.team-audit-list p { margin: 4px 0 0; color: #625d71; font-size: 10px; line-height: 1.6; }
+.contact-honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+.contact-form-error { margin: 0; padding: 10px 12px; border-radius: 6px; background: #fff0f0; color: #8f3434; font-size: 12px; line-height: 1.6; }
+@media (max-width: 760px) {
+  .backoffice-category-nav { top: 6px; margin-inline: -4px; }
+  .backoffice-category-nav a { padding: 9px 11px; }
+  .backoffice-category-card { padding: 18px 15px; border-radius: 11px; }
+  .backoffice-category-card .backoffice-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .backoffice-category-card .backoffice-summary-card { align-items: flex-start; flex-direction: column; gap: 6px; padding: 13px; }
+  .backoffice-category-card .backoffice-summary-card strong { font-size: 23px; }
+  .reservation-filter-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reservation-filter-search { grid-column: 1 / -1; }
+  .team-notifications { align-items: flex-start; flex-direction: column; }
+  .team-sound-toggle { width: 100%; }
+  .team-icebreaker { align-items: flex-start; flex-wrap: wrap; }
+  .team-icebreaker > div { min-width: calc(100% - 60px); }
+  .team-icebreaker button { width: 100%; }
+  .team-message-heading { flex-direction: column; }
+}
+@media (max-width: 420px) {
+  .backoffice-category-card .backoffice-summary { grid-template-columns: 1fr; }
+}
+
 /* Big, unmistakable arrows make primary calls to action feel playful and tactile. */
 @keyframes cta-arrow-bounce { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(4px, -2px, 0); } }
 .button-primary > span[aria-hidden="true"],
