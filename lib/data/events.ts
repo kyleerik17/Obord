@@ -21,12 +21,28 @@ export async function getUpcomingEvents(): Promise<UpcomingEventsResult> {
         persistSession: false,
       },
     })
-    const { data, error } = await supabase
-      .from('events')
-      .select('id,title,event_type,starts_at,ends_at,description,venue_name,venue_area,food_and_drinks,participation_details,capacity,status,event_activities(id,title,description,starts_at,sort_order)')
-      .eq('status', 'published')
-      .gte('starts_at', new Date().toISOString())
-      .order('starts_at', { ascending: true })
+    function fetchEventsWithRegistrationUrl() {
+      return supabase.from('events')
+        .select('id,title,event_type,starts_at,ends_at,description,venue_name,venue_area,food_and_drinks,participation_details,capacity,status,external_registration_url,event_activities(id,title,description,starts_at,sort_order)')
+        .eq('status', 'published')
+        .gte('starts_at', new Date().toISOString())
+        .order('starts_at', { ascending: true })
+    }
+    function fetchEventsWithoutRegistrationUrl() {
+      return supabase.from('events')
+        .select('id,title,event_type,starts_at,ends_at,description,venue_name,venue_area,food_and_drinks,participation_details,capacity,status,event_activities(id,title,description,starts_at,sort_order)')
+        .eq('status', 'published')
+        .gte('starts_at', new Date().toISOString())
+        .order('starts_at', { ascending: true })
+    }
+
+    let { data, error } = await fetchEventsWithRegistrationUrl()
+    if (error?.code === '42703' || error?.code === 'PGRST204') {
+      console.warn('[agenda] Tikko event links are not configured; using the current event schema')
+      const fallback = await fetchEventsWithoutRegistrationUrl()
+      data = fallback.data as typeof data
+      error = fallback.error
+    }
 
     if (error) {
       console.error('[agenda] Supabase query failed', {
@@ -82,6 +98,8 @@ export async function getUpcomingEvents(): Promise<UpcomingEventsResult> {
       return {
         id: row.id,
         title: row.title,
+        startsAt: row.starts_at,
+        registrationUrl: row.external_registration_url ?? null,
         date: row.starts_at.slice(0, 10),
         time: formatTime(row.starts_at),
         endsAt: row.ends_at,

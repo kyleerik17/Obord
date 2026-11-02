@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getUpcomingEvents } from '@/lib/data/events'
 import { pageMetadata } from '@/lib/metadata'
 import EventReservation from './event-reservation'
+import ShareEventButton from './ShareEventButton'
 
 export const metadata = pageMetadata('Soirées et rencontres', 'Découvre les prochaines rencontres et réserve ta place en solo ou en groupe avec O’BORD.')
 
@@ -79,9 +80,13 @@ export default async function Soirees({ searchParams }: { searchParams: Promise<
                     ))}
                     </div>
                   </> : <div className="soirees-program-pending"><p><strong>Programme en préparation.</strong> Les détails seront partagés par l’équipe avant la rencontre.</p></div>}
-                  <Link href={selectedPlan ? `#reservation-${event.id}` : `/soirees?plan=${encodeURIComponent(event.id)}#reservation-${event.id}`} className="soirees-booking-link">Réserver ma place <span aria-hidden="true">↘</span></Link>
+                  <div className="event-actions-row">
+                    <Link href={selectedPlan ? `#reservation-${event.id}` : `/soirees?plan=${encodeURIComponent(event.id)}#reservation-${event.id}`} className="soirees-booking-link">Réserver ma place <span aria-hidden="true">↘</span></Link>
+                    <ShareEventButton title={event.title} description={`${event.title} · ${event.date} à ${event.time} · ${event.venueArea}. ${event.description}`} url={`/soirees?plan=${encodeURIComponent(event.id)}`} />
+                    <a className="event-calendar-link" href={`/api/events/${encodeURIComponent(event.id)}/calendar`}>Ajouter au calendrier</a>
+                  </div>
                 </div>
-                <EventReservation eventId={event.id} />
+                <EventReservation eventId={event.id} title={event.title} startsAt={event.startsAt} registrationUrl={event.registrationUrl} isFull={event.capacity !== null && event.remainingSeats === 0} />
               </article>
             ))}
           </div>

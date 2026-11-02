@@ -15,6 +15,8 @@ export type Activity = {
 export type Event = {
   id: string
   title: string
+  startsAt: string
+  registrationUrl: string | null
   date: string
   time: string
   endsAt: string | null

@@ -4,9 +4,11 @@ import Link from 'next/link'
 import { useEffect, useState, type FormEvent } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { getSupabaseBrowserClient } from '@/lib/supabase'
+import { maximumBirthYearForEvent } from '@/lib/age'
 
 type Reservation = {
   id: string
+  event_id: string
   attendance_type: 'solo' | 'group'
   contact_name: string
   contact_email: string
@@ -22,6 +24,15 @@ type Reservation = {
     status: string
     description: string
   } | null
+}
+
+type WaitlistEntry = {
+  id: string
+  event_id: string
+  group_size: number
+  status: 'waiting' | 'contacted' | 'converted' | 'withdrawn'
+  created_at: string
+  event: { title: string; starts_at: string; venue_area: string } | null
 }
 
 const statusLabels: Record<Reservation['reservation_status'], string> = {
@@ -43,6 +54,8 @@ export default function AccountDashboard() {
   const [user, setUser] = useState<User | null>(null)
   const [fullName, setFullName] = useState('')
   const [reservations, setReservations] = useState<Reservation[]>([])
+  const [waitlistEntries, setWaitlistEntries] = useState<WaitlistEntry[]>([])
+  const [waitlistNotice, setWaitlistNotice] = useState('')
   const [loading, setLoading] = useState(true)
   const [accountLoadedAt, setAccountLoadedAt] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
@@ -71,10 +84,14 @@ export default function AccountDashboard() {
         }
 
         setUser(authData.user)
-        const [profileResult, reservationsResult] = await Promise.all([
+        const [profileResult, reservationsResult, waitlistResult] = await Promise.all([
           supabase.from('profiles').select('full_name').eq('id', authData.user.id).maybeSingle(),
           supabase.from('event_registrations')
-            .select('id,attendance_type,contact_name,contact_email,contact_phone,group_size,attendee_birth_years,reservation_status,created_at,event:events!inner(title,starts_at,venue_area,status,description)')
+            .select('id,event_id,attendance_type,contact_name,contact_email,contact_phone,group_size,attendee_birth_years,reservation_status,created_at,event:events!inner(title,starts_at,venue_area,status,description)')
+            .eq('user_id', authData.user.id)
+            .order('created_at', { ascending: false }),
+          supabase.from('event_waitlist')
+            .select('id,event_id,group_size,status,created_at,event:events!inner(title,starts_at,venue_area)')
             .eq('user_id', authData.user.id)
             .order('created_at', { ascending: false }),
         ])
@@ -85,6 +102,11 @@ export default function AccountDashboard() {
         const authName = authData.user.user_metadata?.full_name
         setFullName(profileResult.data?.full_name ?? (typeof authName === 'string' ? authName : ''))
         setReservations((reservationsResult.data ?? []) as unknown as Reservation[])
+        if (!waitlistResult.error) {
+          setWaitlistEntries((waitlistResult.data ?? []) as unknown as WaitlistEntry[])
+        } else if (!['PGRST205', '42P01'].includes(waitlistResult.error.code)) {
+          setWaitlistNotice('La liste d’attente est momentanément indisponible.')
+        }
         setAccountLoadedAt(Date.now())
       } catch {
         if (active) setError('Tes informations n’ont pas pu être chargées. Réessaie dans un instant.')
@@ -219,6 +241,19 @@ export default function AccountDashboard() {
     }
   }
 
+  async function leaveWaitlist(entry: WaitlistEntry) {
+    setWaitlistNotice('')
+    const supabase = getSupabaseBrowserClient()
+    const { data, error: updateError } = await supabase.from('event_waitlist')
+      .update({ status: 'withdrawn' }).eq('id', entry.id).in('status', ['waiting', 'contacted']).select('id').maybeSingle()
+    if (updateError || !data) {
+      setWaitlistNotice('La demande n’a pas pu être retirée. Réessaie dans un instant.')
+      return
+    }
+    setWaitlistEntries((current) => current.map((item) => item.id === entry.id ? { ...item, status: 'withdrawn' } : item))
+    setWaitlistNotice('Ta demande a été retirée de la liste d’attente.')
+  }
+
   if (loading) {
     return <main className="member-page"><section className="member-loading" role="status">Chargement de ton espace…</section></main>
   }
@@ -234,6 +269,7 @@ export default function AccountDashboard() {
 
   const pendingCount = reservations.filter((item) => item.reservation_status === 'pending').length
   const confirmedCount = reservations.filter((item) => item.reservation_status === 'confirmed').length
+  const activeWaitlistCount = waitlistEntries.filter((item) => ['waiting', 'contacted'].includes(item.status)).length
   const upcomingReservations = reservations.filter((item) => item.event && accountLoadedAt !== null && new Date(item.event.starts_at).getTime() >= accountLoadedAt)
   const pastReservations = reservations.filter((item) => !item.event || (accountLoadedAt !== null && new Date(item.event.starts_at).getTime() < accountLoadedAt))
 
@@ -245,6 +281,7 @@ export default function AccountDashboard() {
           <article className="member-stat"><span>MES DEMANDES</span><strong>{reservations.length}</strong></article>
           <article className="member-stat"><span>EN ATTENTE</span><strong>{pendingCount}</strong></article>
           <article className="member-stat"><span>CONFIRMÉES</span><strong>{confirmedCount}</strong></article>
+          <article className="member-stat"><span>LISTE D’ATTENTE</span><strong>{activeWaitlistCount}</strong></article>
         </section>
 
         <div className="member-grid">
@@ -265,6 +302,7 @@ export default function AccountDashboard() {
 
           <section className="member-reservations" aria-labelledby="member-reservations-title">
             <div className="member-section-heading"><div><p className="event-practical-label">MES RENCONTRES</p><h2 id="member-reservations-title">Mes réservations</h2></div><Link href="/soirees" className="member-browse-link">Choisir une rencontre <span aria-hidden="true">↗</span></Link></div>
+            <p className="member-event-description">Cette page suit les demandes envoyées à O’BORD. Les billets pris directement sur Tikko restent consultables dans ton compte Tikko.</p>
             {reservations.length ? (
               <div className="member-reservation-list">
                 {upcomingReservations.length > 0 && <h3 className="member-list-heading">À venir <span>{upcomingReservations.length}</span></h3>}
@@ -280,7 +318,7 @@ export default function AccountDashboard() {
                     {reservation.event?.status === 'cancelled' && <p className="member-cancelled-note">Cette rencontre a été annulée. Contacte l’équipe si tu as besoin d’informations.</p>}
                     {reservation.event?.status === 'completed' && <p className="member-completed-note">Cette rencontre est terminée. Merci d’avoir partagé ce moment avec O’BORD.</p>}
                     <details className="member-reservation-details"><summary>Voir les informations de ma demande</summary><dl><div><dt>Nom inscrit</dt><dd>{reservation.contact_name}</dd></div><div><dt>E-mail de contact</dt><dd>{reservation.contact_email}</dd></div>{reservation.contact_phone && <div><dt>Téléphone</dt><dd>{reservation.contact_phone}</dd></div>}<div><dt>Participants</dt><dd>{reservation.group_size}</dd></div>{reservation.attendee_birth_years?.length ? <div><dt>Années de naissance enregistrées</dt><dd>{reservation.attendee_birth_years.join(', ')}</dd></div> : null}<div><dt>Demande envoyée</dt><dd>{formatDate(reservation.created_at)}</dd></div></dl></details>
-                    {reservation.reservation_status === 'confirmed' && reservation.event && <p className="member-confirmed-note">Ta réservation est confirmée. Aucune autre démarche n’est nécessaire.</p>}
+                    {reservation.reservation_status === 'confirmed' && reservation.event && <div className="member-confirmed-actions"><p className="member-confirmed-note">Ta réservation est confirmée. Aucune autre démarche n’est nécessaire.</p><a href={`/api/events/${encodeURIComponent(reservation.event_id)}/calendar`}>Ajouter au calendrier</a></div>}
                     {reservation.event && accountLoadedAt !== null && new Date(reservation.event.starts_at).getTime() > accountLoadedAt && ['pending', 'confirmed'].includes(reservation.reservation_status) && <div className="member-request-actions">
                       {reservation.reservation_status === 'pending' && <button type="button" className="member-secondary-action" onClick={() => editingId === reservation.id ? setEditingId(null) : beginReservationEdit(reservation)}>{editingId === reservation.id ? 'Fermer la modification' : 'Modifier ma demande'}</button>}
                       {cancelReservationId === reservation.id ? <div className="member-cancel-confirm"><span>Tu confirmes l’annulation ? La place sera libérée.</span><button type="button" onClick={() => void cancelReservation(reservation)} disabled={savingReservationId === reservation.id}>{savingReservationId === reservation.id ? 'Annulation…' : 'Oui, annuler'}</button><button type="button" onClick={() => setCancelReservationId(null)}>Garder ma place</button></div> : <button type="button" className="member-cancel-action" onClick={() => setCancelReservationId(reservation.id)}>Annuler ma réservation</button>}
@@ -290,7 +328,7 @@ export default function AccountDashboard() {
                       <label htmlFor={`edit-name-${reservation.id}`}>Nom inscrit</label><input id={`edit-name-${reservation.id}`} maxLength={80} required value={editName} onChange={(event) => setEditName(event.target.value)} />
                       <fieldset><legend>Tu viens comment ?</legend><label><input type="radio" name={`edit-type-${reservation.id}`} checked={editType === 'solo'} onChange={() => { setEditType('solo'); setEditGroupSize('1'); setEditBirthYears((years) => [years[0] ?? '']) }} /> En solo</label><label><input type="radio" name={`edit-type-${reservation.id}`} checked={editType === 'group'} onChange={() => { setEditType('group'); setEditGroupSize((size) => Number(size) < 2 ? '2' : size); setEditBirthYears((years) => [years[0] ?? '', years[1] ?? '']) }} /> En groupe</label></fieldset>
                       {editType === 'group' && <><label htmlFor={`edit-size-${reservation.id}`}>Nombre de personnes, toi compris·e</label><input id={`edit-size-${reservation.id}`} type="number" min={2} max={30} required value={editGroupSize} onChange={(event) => { const value = event.target.value; setEditGroupSize(value); const count = Number(value); if (Number.isInteger(count) && count >= 2 && count <= 30) setEditBirthYears((years) => Array.from({ length: count }, (_, index) => years[index] ?? '')) }} /></>}
-                      <div className="member-edit-years">{Array.from({ length: editType === 'solo' ? 1 : Math.min(Math.max(Number(editGroupSize), 0), 30) }, (_, index) => <div key={index}><label htmlFor={`edit-year-${reservation.id}-${index}`}>{editType === 'solo' ? 'Ton année de naissance' : `Année de naissance · personne ${index + 1}`}</label><input id={`edit-year-${reservation.id}-${index}`} type="number" min={1900} max={Number(reservation.event!.starts_at.slice(0, 4)) - 21} required value={editBirthYears[index] ?? ''} onChange={(event) => setEditBirthYears((years) => years.map((year, yearIndex) => yearIndex === index ? event.target.value : year))} /></div>)}</div>
+                      <div className="member-edit-years">{Array.from({ length: editType === 'solo' ? 1 : Math.min(Math.max(Number(editGroupSize), 0), 30) }, (_, index) => <div key={index}><label htmlFor={`edit-year-${reservation.id}-${index}`}>{editType === 'solo' ? 'Ton année de naissance' : `Année de naissance · personne ${index + 1}`}</label><input id={`edit-year-${reservation.id}-${index}`} type="number" min={1900} max={maximumBirthYearForEvent(reservation.event!.starts_at)} required value={editBirthYears[index] ?? ''} onChange={(event) => setEditBirthYears((years) => years.map((year, yearIndex) => yearIndex === index ? event.target.value : year))} /></div>)}</div>
                       <div className="member-edit-buttons"><button type="submit" className="button-primary" disabled={savingReservationId === reservation.id}>{savingReservationId === reservation.id ? 'Enregistrement…' : 'Enregistrer les corrections'}</button><button type="button" className="member-secondary-action" onClick={() => setEditingId(null)}>Retour</button></div>
                     </form>}
                   </article>
@@ -311,6 +349,14 @@ export default function AccountDashboard() {
             )}
           </section>
         </div>
+        <section className="member-waitlist" aria-labelledby="member-waitlist-title">
+          <div className="member-section-heading"><div><p className="event-practical-label">SI UNE PLACE SE LIBÈRE</p><h2 id="member-waitlist-title">Mes listes d’attente</h2></div><Link href="/soirees" className="member-browse-link">Voir les rencontres</Link></div>
+          {waitlistNotice && <p className="member-feedback" role="status">{waitlistNotice}</p>}
+          {waitlistEntries.length ? <div className="member-waitlist-list">{waitlistEntries.map((entry) => <article className="member-waitlist-card" key={entry.id}>
+            <div><span className={`backoffice-status ${entry.status === 'contacted' ? 'status-confirmed' : entry.status === 'withdrawn' ? 'status-cancelled' : ''}`}>{entry.status === 'waiting' ? 'En attente' : entry.status === 'contacted' ? 'L’équipe t’a contacté·e' : entry.status === 'converted' ? 'Inscription finalisée' : 'Retirée'}</span><h3>{entry.event?.title ?? 'Rencontre O’BORD'}</h3><p>{entry.event?.starts_at ? formatDate(entry.event.starts_at) : 'Date à confirmer'} · {entry.group_size} personne{entry.group_size > 1 ? 's' : ''}</p></div>
+            {entry.event && entry.status !== 'withdrawn' && entry.status !== 'converted' && <button type="button" className="member-cancel-action" onClick={() => void leaveWaitlist(entry)}>Retirer ma demande</button>}
+          </article>)}</div> : <p className="member-waitlist-empty">Tu n’as pas de demande sur liste d’attente.</p>}
+        </section>
       </div>
       {(error || notice) && <div className="member-global-feedback" role={error ? 'alert' : 'status'}>{error || notice}<button type="button" aria-label="Fermer le message" onClick={() => { setError(''); setNotice('') }}>×</button></div>}
     </main>

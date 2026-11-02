@@ -838,6 +838,95 @@ body:has(.ob-home) .site-footer-brand > p:not(.site-footer-title) {
   }
 }
 
+/* Agenda management, waitlist, event sharing and calendar actions. */
+.event-actions-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 20px; }
+.event-actions-row .soirees-booking-link { flex: 0 0 auto; }
+.event-share-button, .event-calendar-link, .calendar-download-link {
+  display: inline-flex; min-height: 44px; align-items: center; justify-content: center; padding: 10px 14px;
+  border: 1px solid #dcd6ee; border-radius: 9px; background: #fff; color: #39344e; font-size: 12px; font-weight: 750;
+  transition: transform .2s ease, border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+}
+.event-share-button:hover, .event-calendar-link:hover, .calendar-download-link:hover { transform: translateY(-2px); border-color: #b9aff0; background: #f8f6ff; box-shadow: 0 7px 18px #30226212; }
+.calendar-download-link { justify-self: start; border-color: transparent; background: transparent; color: #51479b; text-decoration: underline; text-underline-offset: 4px; }
+.event-admin-manager, .backoffice-waitlist, .member-waitlist {
+  min-width: 0; margin: 24px 0; padding: clamp(19px, 4vw, 30px); border: 1px solid #e4e0ef; border-radius: 12px; background: #fff; box-shadow: 0 10px 35px #30226209;
+}
+.event-admin-manager > header h2, .backoffice-waitlist > header h2 { margin: 4px 0 7px; color: #282438; font-family: var(--font-space), sans-serif; font-size: clamp(24px, 4vw, 33px); letter-spacing: -.055em; }
+.event-admin-manager > header > p:last-child, .backoffice-waitlist > header > p:last-child { max-width: 680px; margin: 0 0 18px; color: #514d5e; font-size: 13px; line-height: 1.7; }
+.event-admin-create, .event-admin-item { overflow: hidden; border: 1px solid #e4e0ef; border-radius: 10px; background: #fff; }
+.event-admin-create { margin-bottom: 13px; }
+.event-admin-create > summary, .event-admin-item > summary { display: flex; min-height: 58px; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 16px; color: #292638; cursor: pointer; font-size: 14px; font-weight: 800; list-style: none; }
+.event-admin-create > summary::-webkit-details-marker, .event-admin-item > summary::-webkit-details-marker { display: none; }
+.event-admin-create > summary::after { color: #6c5ce7; content: "+"; font-size: 22px; transition: transform .2s ease; }
+.event-admin-create[open] > summary::after { transform: rotate(45deg); }
+.event-admin-list { display: grid; gap: 9px; }
+.event-admin-item > summary > span:first-child { display: grid; min-width: 0; gap: 4px; }
+.event-admin-item > summary strong { overflow-wrap: anywhere; }
+.event-admin-item > summary small { color: #625d71; font-size: 12px; font-weight: 500; }
+.event-admin-status { flex: none; padding: 6px 9px; border-radius: 999px; background: #f3f0ff; color: #51479b; font-size: 11px; font-weight: 800; }
+.event-admin-status-draft { background: #fff5df; color: #76550d; }
+.event-admin-status-cancelled { background: #f8e9e9; color: #823f48; }
+.event-admin-status-completed { background: #eef0f3; color: #4b5261; }
+.event-admin-item form, .event-admin-create form { padding: 4px 16px 18px; border-top: 1px solid #eeeaf5; }
+.event-admin-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin: 15px 0; }
+.event-admin-fields > label, .waitlist-form > label, .waitlist-years > label { display: grid; min-width: 0; align-content: start; gap: 6px; color: #343042; font-size: 12px; font-weight: 750; }
+.event-admin-fields input, .event-admin-fields select, .event-admin-fields textarea,
+.waitlist-form input { width: 100%; min-width: 0; min-height: 45px; padding: 10px 11px; border: 1px solid #d9d4e7; border-radius: 8px; background: #fff; color: #211e2e; font-size: 14px; }
+.event-admin-fields textarea { resize: vertical; line-height: 1.6; }
+.event-admin-fields input:focus, .event-admin-fields select:focus, .event-admin-fields textarea:focus, .waitlist-form input:focus { border-color: var(--primary); outline: 3px solid #6c5ce71c; }
+.event-admin-fields small { color: #625d71; font-size: 11px; font-weight: 500; line-height: 1.5; }
+.event-admin-description { grid-column: 1 / -1; }
+.event-admin-manager form > .button-primary { min-height: 48px; border: 0; cursor: pointer; }
+.backoffice-waitlist-list, .member-waitlist-list { display: grid; gap: 11px; }
+.backoffice-waitlist-item, .member-waitlist-card { display: flex; min-width: 0; align-items: center; justify-content: space-between; gap: 18px; padding: 16px; border: 1px solid #e4e0ef; border-radius: 10px; background: #fff; }
+.backoffice-waitlist-item > div:first-child, .member-waitlist-card > div:first-child { min-width: 0; }
+.backoffice-waitlist-item h3, .member-waitlist-card h3 { margin: 9px 0 4px; color: #282438; font-family: var(--font-space), sans-serif; font-size: 17px; letter-spacing: -.035em; }
+.backoffice-waitlist-item p, .member-waitlist-card p { margin: 4px 0; color: #514d5e; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.backoffice-waitlist-item small { color: #625d71; font-size: 11px; }
+.backoffice-waitlist-actions { display: flex; flex: none; flex-wrap: wrap; gap: 8px; }
+.backoffice-waitlist-actions a, .backoffice-waitlist-actions button, .backoffice-confirmation-link {
+  display: inline-flex; min-height: 43px; align-items: center; justify-content: center; padding: 9px 12px;
+  border: 1px solid #dcd6ee; border-radius: 8px; background: #fff; color: #51479b; font-size: 12px; font-weight: 800; cursor: pointer;
+  transition: transform .18s ease, background-color .18s ease, border-color .18s ease;
+}
+.backoffice-waitlist-actions a:hover, .backoffice-waitlist-actions button:hover, .backoffice-confirmation-link:hover { transform: translateY(-2px); border-color: #b9aff0; background: #f8f6ff; }
+.backoffice-confirmation-link { margin-right: auto; }
+.member-waitlist { margin-top: 22px; }
+.member-waitlist .member-section-heading { margin-bottom: 15px; }
+.member-waitlist-empty { color: #625d71; font-size: 13px; }
+.member-confirmed-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.member-confirmed-actions .member-confirmed-note { margin: 0; }
+.member-confirmed-actions > a { color: #51479b; font-size: 12px; font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
+.waitlist-panel { display: grid; gap: 17px; }
+.waitlist-intro h3 { margin: 4px 0 8px; color: #282438; font-family: var(--font-space), sans-serif; font-size: clamp(20px, 3vw, 27px); letter-spacing: -.045em; }
+.waitlist-intro > p:last-child { max-width: 640px; margin: 0; color: #514d5e; font-size: 13px; line-height: 1.7; }
+.waitlist-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.waitlist-years { display: grid; grid-column: 1 / -1; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.waitlist-form > button { justify-self: start; min-height: 48px; border: 0; cursor: pointer; }
+.waitlist-login p { color: #514d5e; font-size: 13px; }
+.waitlist-login .button-primary { display: inline-flex; min-height: 47px; align-items: center; }
+.waitlist-event-context { margin: 0; color: #625d71; font-size: 12px; }
+.waitlist-event-context strong { color: #282438; }
+@media (max-width: 700px) {
+  .event-admin-fields { grid-template-columns: minmax(0, 1fr); }
+  .event-admin-description, .waitlist-years { grid-column: auto; }
+  .backoffice-waitlist-item, .member-waitlist-card { align-items: flex-start; flex-direction: column; }
+  .backoffice-waitlist-actions { width: 100%; }
+  .backoffice-waitlist-actions > a, .backoffice-waitlist-actions > form, .backoffice-waitlist-actions button { width: 100%; }
+  .backoffice-confirmation-link { width: 100%; }
+  .event-actions-row { align-items: stretch; flex-direction: column; }
+  .event-actions-row > * { width: 100%; }
+  .event-actions-row .soirees-booking-link { justify-content: center; }
+  .waitlist-form { grid-template-columns: minmax(0, 1fr); }
+  .waitlist-years { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .event-share-button, .event-calendar-link, .calendar-download-link,
+  .soft-card, .event-admin-create > summary::after,
+  .backoffice-waitlist-actions a, .backoffice-waitlist-actions button,
+  .backoffice-confirmation-link { transition: none !important; }
+}
+
 /* Keep compact event actions legible at the narrowest viewport widths. */
 @media (max-width: 640px) {
   .ticket-arrow { width: auto; min-height: 40px; padding-inline: 10px; font-size: 10px; }
@@ -1165,4 +1254,169 @@ body:has(.ob-home) nav[aria-label="Navigation principale"] #mobile-navigation a:
 @media (max-width: 640px) {
   .video-memory > div:first-child { min-width: 0; }
   .stat { gap: 0; }
+}
+
+/* Réservation : hiérarchie éditoriale, action tactile et animations douces. */
+.registration-section.registration-redirect {
+  position: relative; isolation: isolate; grid-template-columns: minmax(0, .9fr) minmax(320px, 1.1fr);
+  gap: clamp(24px, 5vw, 64px); overflow: hidden; margin-top: 32px; padding: clamp(24px, 4.5vw, 48px);
+  border: 1px solid #e9e5f4; border-radius: 18px;
+  background: linear-gradient(145deg, #fff 0%, #fcfbff 62%, #f3f0ff 100%); box-shadow: 0 18px 48px #30226212;
+  scroll-margin-top: 96px;
+}
+.registration-redirect::after {
+  position: absolute; z-index: -1; right: -95px; bottom: -150px; width: 300px; aspect-ratio: 1;
+  border: 1px solid #6c5ce71c; border-radius: 50%; box-shadow: 0 0 0 28px #6c5ce708, 0 0 0 58px #ff767508;
+  content: ""; pointer-events: none;
+}
+.registration-redirect .registration-intro { min-width: 0; max-width: 520px; }
+.registration-redirect .registration-intro .eyebrow { margin-bottom: 13px; color: #6457cf; font-size: 10px; letter-spacing: .16em; }
+.registration-redirect .registration-intro h2 { max-width: 440px; margin: 0; color: #211e2e; font-size: clamp(30px, 4vw, 48px); letter-spacing: -.065em; line-height: 1.04; text-wrap: balance; }
+.registration-redirect .registration-intro > p:last-child { max-width: 430px; margin: 15px 0 0; color: #5c5868; font-size: 14px; line-height: 1.75; }
+.registration-redirect-card {
+  display: grid; min-width: 0; min-height: 0; align-content: center; justify-items: start; gap: 23px;
+  padding: clamp(22px, 3vw, 32px); border: 1px solid #e4def9; border-radius: 16px; background: #fff;
+  box-shadow: 0 14px 38px #30226212; transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+  animation: reservation-card-in .7s .12s both cubic-bezier(.2,.75,.25,1);
+}
+.registration-redirect-card:hover { transform: translateY(-4px); border-color: #c9c0f5; box-shadow: 0 22px 48px #3022621c; }
+.registration-redirect-copy, .registration-redirect-copy > div { min-width: 0; }
+.registration-redirect-kicker { display: block; margin-bottom: 10px; color: #6c5ce7; font-size: 10px; font-weight: 800; letter-spacing: .14em; }
+.registration-redirect-copy strong { display: block; max-width: 360px; color: #282438; font-family: var(--font-space), sans-serif; font-size: clamp(19px, 2.3vw, 24px); letter-spacing: -.045em; line-height: 1.2; text-wrap: balance; }
+.registration-redirect-copy p { max-width: 390px; margin: 9px 0 0; color: #514d5e; font-size: 13px; line-height: 1.7; }
+.registration-redirect-card .registration-submit { display: inline-flex; width: 100%; min-height: 56px; align-items: center; justify-content: center; gap: 10px; padding: 12px 20px; border-radius: 10px; background: #6c5ce7; box-shadow: 0 5px 0 #4939bd, 0 12px 24px #6c5ce72b; color: white; font-size: 14px; font-weight: 800; transition: transform .22s ease, background .22s ease, box-shadow .22s ease; }
+.registration-redirect-card .registration-submit:hover { transform: translateY(-2px) scale(1.015); background: #5949d5; box-shadow: 0 7px 0 #4939bd, 0 17px 30px #6c5ce73b; }
+.registration-redirect-card .registration-submit:active { transform: translateY(1px) scale(.99); box-shadow: 0 2px 0 #4939bd; }
+.registration-redirect-card .registration-submit span { transition: transform .22s ease; }
+.registration-redirect-card .registration-submit:hover span { transform: translate(2px, -2px); }
+.soirees-event-card, .soirees-event-body, .soirees-event-head { min-width: 0; }
+.soirees-event-description { max-width: 68ch; font-size: 14px; line-height: 1.8; }
+.event-practical-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 225px), 1fr)); gap: 14px; }
+.event-practical-card { min-width: 0; min-height: 142px; padding: 20px; border-radius: 14px; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.event-practical-card:hover { transform: translateY(-3px); border-color: #d8d0f5; box-shadow: 0 14px 30px #30226212; }
+.event-practical-card h3 { overflow-wrap: anywhere; font-size: 17px; line-height: 1.35; }
+.event-practical-card p { overflow-wrap: anywhere; font-size: 13px; line-height: 1.65; }
+@keyframes reservation-card-in { from { opacity: 0; transform: translateY(18px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 760px) {
+  .registration-section.registration-redirect { grid-template-columns: minmax(0, 1fr); gap: 24px; margin-top: 27px; padding: clamp(20px, 5vw, 30px); }
+  .registration-redirect .registration-intro h2 { max-width: 620px; font-size: clamp(32px, 8vw, 44px); }
+  .registration-redirect .registration-intro > p:last-child { font-size: 14px; }
+  .registration-redirect-card { width: 100%; gap: 19px; padding: clamp(19px, 4vw, 26px); }
+  .event-practical-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .registration-section.registration-redirect { gap: 20px; margin-top: 23px; padding: 21px 17px; border-radius: 15px; }
+  .registration-redirect-card { gap: 18px; padding: 20px 17px; border-radius: 13px; }
+  .registration-redirect-copy strong { font-size: 21px; }
+  .registration-redirect-copy p { font-size: 13px; }
+  .registration-redirect-card .registration-submit { min-height: 54px; font-size: 14px; }
+  .event-practical-grid { grid-template-columns: minmax(0, 1fr); gap: 11px; }
+  .event-practical-card { min-height: 0; padding: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .registration-redirect-card, .event-practical-card { animation: none; transition: none; }
+}
+
+/* Cohérence des interactions et des entrées sur l’ensemble du site. */
+@keyframes app-page-enter {
+  from { opacity: 0; translate: 0 10px; }
+  to { opacity: 1; translate: 0 0; }
+}
+main > :first-child {
+  animation: app-page-enter .48s cubic-bezier(.2,.75,.25,1) both;
+}
+.soft-card { transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease; }
+.soft-card:hover { transform: translateY(-3px); border-color: #c9c0f5; box-shadow: 0 16px 38px #30226214; }
+.trust-grid > .trust-card,
+.event-ticket,
+.blog-card,
+.member-reservation-card,
+.backoffice-reservation,
+.backoffice-event-card,
+.backoffice-photo-event {
+  transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+}
+.trust-grid > .trust-card:hover,
+.event-ticket:hover,
+.blog-card:hover,
+.member-reservation-card:hover,
+.backoffice-reservation:hover,
+.backoffice-event-card:hover,
+.backoffice-photo-event:hover {
+  transform: translateY(-3px);
+  border-color: #c9c0f5;
+  box-shadow: 0 16px 38px #30226214;
+}
+.trust-grid > .trust-card:focus-within,
+.event-ticket:focus-within,
+.blog-card:focus-within,
+.member-reservation-card:focus-within,
+.backoffice-reservation:focus-within,
+.backoffice-event-card:focus-within,
+.backoffice-photo-event:focus-within {
+  border-color: #b9aff0;
+  box-shadow: 0 0 0 3px #6c5ce71b, 0 14px 34px #30226212;
+}
+.blog-card-cover { transition: transform .45s cubic-bezier(.2,.75,.25,1); }
+.blog-card:hover .blog-card-cover { transform: scale(1.035); }
+.faq-item { transition: border-color .2s ease, box-shadow .2s ease; }
+.faq-item[open] { border-color: #c9c0f5; box-shadow: 0 12px 30px #30226210; }
+.faq-item summary { min-height: 56px; }
+.contact-form input, .contact-form textarea,
+.blog-admin-form input:not([type="file"]):not([type="checkbox"]), .blog-admin-form textarea,
+.member-edit-form input, .backoffice-age-form input {
+  transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+.contact-form input:focus, .contact-form textarea:focus,
+.blog-admin-form input:not([type="file"]):not([type="checkbox"]):focus, .blog-admin-form textarea:focus,
+.member-edit-form input:focus, .backoffice-age-form input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px #6c5ce71c;
+}
+.trust-page-actions > a, .blog-article-footer > a, .member-browse-link,
+.member-secondary-action, .member-cancel-action, .backoffice-decline {
+  transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
+}
+.trust-page-actions > a:hover, .blog-article-footer > a:hover, .member-browse-link:hover,
+.member-secondary-action:hover, .member-cancel-action:hover, .backoffice-decline:hover {
+  transform: translateY(-2px);
+}
+.trust-content, .blog-content, .blog-article-page, .member-content, .backoffice-content,
+.soirees-content { min-width: 0; }
+@media (max-width: 640px) {
+  .trust-content, .blog-content { width: min(100% - 32px, 1120px); }
+  .trust-card { padding: 20px; }
+  .trust-card p, .trust-hero > p:last-child, .contact-form label, .contact-details > a,
+  .contact-detail-static, .legal-content p, .legal-content li, .legal-content dl,
+  .faq-answer p, .blog-card-copy p { font-size: 13px; line-height: 1.75; }
+  .contact-form input, .contact-form textarea,
+  .blog-admin-form input:not([type="file"]):not([type="checkbox"]), .blog-admin-form textarea { min-height: 48px; font-size: 16px; }
+  .contact-form textarea, .blog-admin-form textarea { min-height: 112px; }
+  .contact-form .button-primary, .blog-admin-form .button-primary { width: 100%; justify-content: center; }
+  .legal-content dl { grid-template-columns: 1fr; gap: 4px; }
+  .legal-content dd { margin-bottom: 10px; overflow-wrap: anywhere; }
+  .trust-grid { gap: 12px; }
+  .faq-item summary { min-height: 58px; padding: 15px 16px; font-size: 14px; }
+  .faq-answer { padding: 0 16px 16px; }
+}
+@media (hover: none) {
+  .trust-grid > .trust-card:hover, .event-ticket:hover, .blog-card:hover,
+  .member-reservation-card:hover, .backoffice-reservation:hover,
+  .backoffice-event-card:hover, .backoffice-photo-event:hover,
+  .event-practical-card:hover, .registration-redirect-card:hover {
+    transform: none;
+  }
+  .blog-card:hover .blog-card-cover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  main > :first-child,
+  .trust-grid > .trust-card, .event-ticket, .blog-card, .blog-card-cover,
+  .member-reservation-card, .backoffice-reservation, .backoffice-event-card,
+  .backoffice-photo-event, .soft-card, .faq-item, .trust-page-actions > a,
+  .blog-article-footer > a, .member-browse-link, .member-secondary-action,
+  .member-cancel-action, .backoffice-decline {
+    animation: none !important;
+    transition: none !important;
+    translate: none !important;
+  }
 }
