@@ -11,42 +11,6 @@ grant select on public.event_registrations to authenticated;
 revoke update on public.event_registrations from authenticated;
 grant update (reservation_status, attendee_birth_years) on public.event_registrations to authenticated;
 
-create or replace function public.guard_registration_age_update()
-returns trigger
-language plpgsql
-set search_path = ''
-as $$
-begin
-  if current_user not in ('postgres', 'service_role')
-     and (select auth.jwt() -> 'app_metadata' ->> 'role') is distinct from 'organizer' then
-    raise exception 'organizer_required';
-  end if;
-  return new;
-end;
-$$;
-
-drop trigger if exists event_registrations_guard_age_update on public.event_registrations;
-create trigger event_registrations_guard_age_update
-before update of attendee_birth_years on public.event_registrations
-for each row execute function public.guard_registration_age_update();
-revoke all on function public.guard_registration_age_update() from public, anon, authenticated;
-
-create or replace function public.guard_registration_birth_year_update()
-returns trigger language plpgsql set search_path = '' as $$
-begin
-  if current_user not in ('postgres', 'service_role')
-     and (select auth.jwt() -> 'app_metadata' ->> 'role') is distinct from 'organizer' then
-    raise exception 'organizer_required';
-  end if;
-  return new;
-end;
-$$;
-drop trigger if exists event_registrations_guard_birth_year_update on public.event_registrations;
-create trigger event_registrations_guard_birth_year_update
-before update of attendee_birth_years on public.event_registrations
-for each row execute function public.guard_registration_birth_year_update();
-revoke all on function public.guard_registration_birth_year_update() from public, anon, authenticated;
-
 drop policy if exists "Organizers can read all events" on public.events;
 create policy "Organizers can read all events"
 on public.events for select to authenticated

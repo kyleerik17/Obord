@@ -64,7 +64,6 @@ alter table public.event_registrations
       cardinality(attendee_birth_years) = group_size
       and array_position(attendee_birth_years, null) is null
       and 1900 <= all(attendee_birth_years)
-      and registration_birth_years_meet_minimum(attendee_birth_years, created_at)
     )
   );
 
@@ -102,16 +101,38 @@ returns trigger
 language plpgsql
 set search_path = ''
 as $$
+declare
+  event_start timestamptz;
 begin
-  if current_user not in ('postgres', 'service_role')
-     and (select auth.jwt() -> 'app_metadata' ->> 'role') is distinct from 'organizer' then
-    raise exception 'organizer_required';
+  select starts_at into event_start
+  from public.events
+  where id = new.event_id;
+
+  if not public.registration_birth_years_meet_minimum(new.attendee_birth_years, event_start) then
+    raise exception 'reservation_birth_years_invalid';
   end if;
+
+  if current_user in ('postgres', 'service_role')
+     or (select auth.jwt() -> 'app_metadata' ->> 'role') = 'organizer' then
+    return new;
+  end if;
+
+  if old.user_id is distinct from (select auth.uid())
+     or old.reservation_status <> 'pending'
+     or new.reservation_status <> 'pending'
+     or new.user_id is distinct from old.user_id
+     or new.event_id is distinct from old.event_id
+     or event_start <= now() then
+    raise exception 'reservation_edit_not_allowed';
+  end if;
+
   return new;
 end;
 $$;
 
 drop trigger if exists event_registrations_guard_birth_year_update on public.event_registrations;
+drop trigger if exists event_registrations_guard_age_update on public.event_registrations;
+drop function if exists public.guard_registration_age_update();
 create trigger event_registrations_guard_birth_year_update
 before update of attendee_birth_years on public.event_registrations
 for each row execute function public.guard_registration_birth_year_update();

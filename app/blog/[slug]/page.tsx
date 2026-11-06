@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPublishedBlogPost } from '@/lib/data/blog'
@@ -35,7 +36,7 @@ export default async function BlogPostPage({ params }: Props) {
       <article className="blog-article">
         <Link href="/blog" className="blog-article-back">← Tous les articles</Link>
         <header className="blog-article-header"><p className="blog-eyebrow">LE JOURNAL O’BORD</p><time dateTime={post.published_at}>{new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Africa/Abidjan' }).format(new Date(post.published_at))}</time><h1>{post.title}</h1><p>{post.excerpt}</p></header>
-        {post.coverImageUrl && <img className="blog-article-cover" src={post.coverImageUrl} alt={`Illustration de ${post.title}`} />}
+        {post.coverImageUrl && <Image className="blog-article-cover" src={post.coverImageUrl} alt={`Illustration de ${post.title}`} width={1200} height={675} sizes="(max-width: 900px) 100vw, 900px" />}
         <div className="blog-article-content">{paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>
         <footer className="blog-article-footer"><p>Un mot à partager avec le collectif ?</p><Link href="/contact" className="button-primary">Écrire à O’BORD</Link></footer>
       </article>

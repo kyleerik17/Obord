@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { getUpcomingEvents } from '@/lib/data/events'
 import { pageMetadata } from '@/lib/metadata'
 import EventReservation from './event-reservation'
@@ -47,7 +48,7 @@ export default async function Soirees({ searchParams }: { searchParams: Promise<
                 </div>
 
                 <div className="soirees-event-body">
-                  {event.imageUrls.length > 0 && <div className="event-photo-gallery" aria-label={`Photos de ${event.title}`}>{event.imageUrls.map((url, imageIndex) => <figure key={url}><img src={url} alt={`${event.title} — photo ${imageIndex + 1}`} loading="lazy" /></figure>)}</div>}
+                  {event.imageUrls.length > 0 && <div className="event-photo-gallery" aria-label={`Photos de ${event.title}`}>{event.imageUrls.map((url, imageIndex) => <figure key={url}><Image src={url} alt={`${event.title} — photo ${imageIndex + 1}`} width={960} height={600} sizes="(max-width: 700px) 100vw, 50vw" /></figure>)}</div>}
                   <p className="soirees-event-description">{event.description}</p>
                   {event.capacity !== null && <div className="event-availability" aria-live="polite"><div><p className="event-practical-label">LES PLACES</p>{event.remainingSeats === null ? <strong>Jusqu’à {event.capacity} personnes</strong> : event.remainingSeats === 0 ? <strong>Rencontre complète</strong> : <strong>{event.remainingSeats} place{event.remainingSeats > 1 ? 's' : ''} restante{event.remainingSeats > 1 ? 's' : ''}</strong>}{event.reservedCount !== null && <p>{event.reservedCount} / {event.capacity} places prises</p>}</div></div>}
                   <div className="event-practical-grid">

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { pageMetadata } from '@/lib/metadata'
 import { getPublishedBlogPosts } from '@/lib/data/blog'
 
@@ -25,7 +26,7 @@ export default async function BlogPage() {
             {posts.map((post) => (
               <article className="blog-card" key={post.id}>
                 <Link href={`/blog/${encodeURIComponent(post.slug)}`} className="blog-card-link" aria-label={`Lire l’article : ${post.title}`}>
-                  {post.coverImageUrl ? <img className="blog-card-cover" src={post.coverImageUrl} alt={`Miniature de l’article ${post.title}`} loading="lazy" /> : <div className="blog-card-placeholder" aria-hidden="true"><span>O’BORD</span></div>}
+                  {post.coverImageUrl ? <Image className="blog-card-cover" src={post.coverImageUrl} alt={`Miniature de l’article ${post.title}`} width={800} height={500} sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw" /> : <div className="blog-card-placeholder" aria-hidden="true"><span>O’BORD</span></div>}
                   <div className="blog-card-copy"><time dateTime={post.published_at}>{formatDate(post.published_at)}</time><h3>{post.title}</h3><p>{post.excerpt}</p><span className="blog-read-link">Lire l’article</span></div>
                 </Link>
               </article>

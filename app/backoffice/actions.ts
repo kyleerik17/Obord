@@ -23,6 +23,25 @@ export async function updateReservationDecision(formData: FormData) {
     redirect('/backoffice?result=invalid')
   }
 
+  if (decision === 'confirmed') {
+    const { data: registration, error: registrationError } = await supabase
+      .from('event_registrations')
+      .select('group_size,attendee_birth_years,event:events!inner(starts_at)')
+      .eq('id', registrationId)
+      .eq('reservation_status', 'pending')
+      .maybeSingle()
+
+    const eventRelation = registration?.event as unknown as { starts_at: string } | { starts_at: string }[] | null
+    const event = Array.isArray(eventRelation) ? eventRelation[0] : eventRelation
+    const birthYears = registration?.attendee_birth_years
+    const maximumBirthYear = event?.starts_at ? maximumBirthYearForEvent(event.starts_at) : 0
+    if (registrationError || !registration || !event?.starts_at
+      || !Array.isArray(birthYears) || birthYears.length !== registration.group_size
+      || birthYears.some((year: number) => !Number.isInteger(year) || year < 1900 || year > maximumBirthYear)) {
+      redirect('/backoffice?result=age-required')
+    }
+  }
+
   const { data, error } = await supabase
     .from('event_registrations')
     .update({ reservation_status: decision })
@@ -31,7 +50,9 @@ export async function updateReservationDecision(formData: FormData) {
     .select('id')
     .maybeSingle()
 
-  if (error) redirect('/backoffice?result=error')
+  if (error) redirect(error.message.includes('reservation_birth_years_invalid')
+    ? '/backoffice?result=age-required'
+    : '/backoffice?result=error')
   if (!data) redirect('/backoffice?result=stale')
 
   revalidatePath('/backoffice')

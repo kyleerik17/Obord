@@ -139,6 +139,7 @@ export default async function BackofficePage({ searchParams }: { searchParams: P
     forbidden: 'Cette action nécessite un compte organisateur.',
     'birth-years-saved': 'Les années de naissance ont été enregistrées. Tu peux maintenant traiter la demande.',
     'invalid-birth-years': 'Indique une année valide pour chaque personne, correspondant à 21 ans minimum à la date de la rencontre.',
+    'age-required': 'Impossible de confirmer : vérifie l’année de naissance de chaque personne et leur éligibilité à la date du plan.',
     'birth-year-save-error': 'Les années de naissance n’ont pas pu être enregistrées. Vérifie que les scripts SQL ont été appliqués.',
     'age-stale': 'Cette demande a changé depuis son affichage. Actualise la page et réessaie.',
     'event-invalid': 'Vérifie les champs, les dates et la capacité de la rencontre.',

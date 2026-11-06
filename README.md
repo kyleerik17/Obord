@@ -87,7 +87,7 @@ Les pages `/faq`, `/mentions-legales`, `/conditions`, `/confidentialite` et `/co
 
 Pour créer le schéma, exécute [`supabase/obord_schema.sql`](supabase/obord_schema.sql), puis [`supabase/obord_backoffice.sql`](supabase/obord_backoffice.sql), dans **Supabase → SQL Editor**.
 
-Pour mettre à niveau une base existante, applique les migrations adaptées à son état. Les scripts disponibles couvrent le contrôle de l’âge, les règles de réservation, le back-office et l’accès de l’équipe. Consulte chaque script avant de l’exécuter et conserve les règles RLS activées.
+Pour mettre à niveau une base existante, applique les scripts dans l’ordre correspondant à son état. Après `obord_schema.sql`, `obord_birth_year_requirement.sql` et `obord_capacity_member_edits_event_photos.sql`, exécute aussi [`supabase/fix_registration_age_edit_trigger.sql`](supabase/fix_registration_age_edit_trigger.sql). Ce correctif attache le contrôle d’âge des modifications au bon déclencheur et vérifie l’éligibilité à la date de la rencontre.
 
 Pour permettre à chaque participant de retrouver aussi les rencontres passées liées à ses réservations, exécute [`supabase/obord_member_space.sql`](supabase/obord_member_space.sql) dans le SQL Editor.
 
@@ -110,6 +110,6 @@ Le schéma utilise notamment ces tables :
 
 ## Configuration et secrets
 
-Les variables locales se placent dans `.env.local`, ignoré par Git. Sur Vercel, configure les variables dans les paramètres du projet pour les environnements concernés (Production, Preview et Development). Après toute modification de variables, redéploie l’application.
+Les variables locales se placent dans `.env.local`, ignoré par Git. Le site lit `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` depuis l’environnement : la configuration Vercel doit utiliser ces mêmes noms pour Production, Preview et Development. `NEXT_PUBLIC_SITE_URL` sert à produire des liens SEO absolus. Après toute modification de variables, redéploie l’application.
 
 La clé publique Supabase peut être utilisée côté navigateur avec les politiques RLS adaptées. Toute clé secrète ou clé de service doit rester exclusivement côté serveur et ne doit jamais être publiée dans le dépôt.

@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { useState, type ChangeEvent } from 'react'
 import { getSupabaseBrowserClient } from '@/lib/supabase'
 
@@ -129,7 +130,7 @@ export default function EventPhotoManager({ initialEvents, setupMissing = false 
           <div className="backoffice-photo-event-heading"><div><h3>{event.title}</h3><p>{new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Africa/Abidjan' }).format(new Date(event.starts_at))}</p></div><span>{event.image_paths.length}/{MAX_PHOTOS} photos</span></div>
           {event.image_paths.length > 0 && <div className="backoffice-photo-grid">{event.image_paths.map((path) => {
             const url = supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl
-            return <figure key={path}><img src={url} alt={`Photo de ${event.title}`} /><button type="button" onClick={() => void removePhoto(event, path)} disabled={busyEventId === event.id}>Retirer</button></figure>
+            return <figure key={path}><Image src={url} alt={`Photo de ${event.title}`} width={480} height={360} sizes="(max-width: 640px) 45vw, 180px" /><button type="button" onClick={() => void removePhoto(event, path)} disabled={busyEventId === event.id}>Retirer</button></figure>
           })}</div>}
           <label className="backoffice-photo-upload">{busyEventId === event.id ? 'Enregistrement des photos…' : 'Ajouter des photos'}<input type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={busyEventId === event.id || event.image_paths.length >= MAX_PHOTOS} onChange={(change) => void uploadPhotos(event.id, change)} /></label>
           <p className="backoffice-photo-help">JPEG, PNG ou WebP · 5 Mo maximum par photo</p>

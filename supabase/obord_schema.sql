@@ -137,7 +137,6 @@ alter table public.event_registrations
         cardinality(attendee_birth_years) = group_size
         and array_position(attendee_birth_years, null) is null
         and 1900 <= all(attendee_birth_years)
-        and public.registration_birth_years_meet_minimum(attendee_birth_years, created_at)
       )
     ),
   add constraint event_registrations_solo_group_size_check
@@ -200,7 +199,20 @@ returns trigger
 language plpgsql
 set search_path = ''
 as $$
+declare
+  event_start timestamptz;
 begin
+  if new.reservation_status = 'confirmed'
+     and old.reservation_status is distinct from 'confirmed' then
+    select starts_at into event_start
+    from public.events
+    where id = new.event_id;
+
+    if not public.registration_birth_years_meet_minimum(new.attendee_birth_years, event_start) then
+      raise exception 'reservation_birth_years_invalid';
+    end if;
+  end if;
+
   if new.reservation_status = 'confirmed' and old.reservation_status is distinct from 'confirmed' then
     new.reservation_confirmed_at := now();
   end if;
@@ -217,24 +229,45 @@ create trigger event_registrations_set_confirmation_timestamps
 before update on public.event_registrations
 for each row execute function public.set_registration_timestamps();
 
-create or replace function public.guard_registration_age_update()
+create or replace function public.guard_registration_birth_year_update()
 returns trigger
 language plpgsql
 set search_path = ''
 as $$
+declare
+  event_start timestamptz;
 begin
-  if current_user not in ('postgres', 'service_role')
-     and (select auth.jwt() -> 'app_metadata' ->> 'role') is distinct from 'organizer' then
-    raise exception 'organizer_required';
+  select starts_at into event_start
+  from public.events
+  where id = new.event_id;
+
+  if not public.registration_birth_years_meet_minimum(new.attendee_birth_years, event_start) then
+    raise exception 'reservation_birth_years_invalid';
   end if;
+
+  if current_user in ('postgres', 'service_role')
+     or (select auth.jwt() -> 'app_metadata' ->> 'role') = 'organizer' then
+    return new;
+  end if;
+
+  if old.user_id is distinct from (select auth.uid())
+     or old.reservation_status <> 'pending'
+     or new.reservation_status <> 'pending'
+     or new.user_id is distinct from old.user_id
+     or new.event_id is distinct from old.event_id then
+    raise exception 'reservation_edit_not_allowed';
+  end if;
+
   return new;
 end;
 $$;
 
+revoke all on function public.guard_registration_birth_year_update() from public, anon, authenticated;
 drop trigger if exists event_registrations_guard_age_update on public.event_registrations;
-create trigger event_registrations_guard_age_update
+drop trigger if exists event_registrations_guard_birth_year_update on public.event_registrations;
+create trigger event_registrations_guard_birth_year_update
   before update of attendee_birth_years on public.event_registrations
-for each row execute function public.guard_registration_age_update();
+for each row execute function public.guard_registration_birth_year_update();
 
 -- Reserve capacity atomically. Pending requests count until an organizer
 -- confirms, declines, or cancels them. A row lock prevents two simultaneous
@@ -385,28 +418,9 @@ drop policy if exists "Participants can confirm own attendance" on public.event_
 
 -- Explicit grants keep the policies meaningful and do not expose private tables.
 revoke all on public.profiles, public.events, public.event_activities, public.event_registrations from anon, authenticated;
-revoke all on function public.guard_registration_age_update() from public, anon, authenticated;
+drop function if exists public.guard_registration_age_update();
 revoke all on function public.registration_birth_years_meet_minimum(integer[], timestamptz) from public, anon;
 grant execute on function public.registration_birth_years_meet_minimum(integer[], timestamptz) to authenticated;
-
-create or replace function public.guard_registration_birth_year_update()
-returns trigger
-language plpgsql
-set search_path = ''
-as $$
-begin
-  if current_user not in ('postgres', 'service_role')
-     and (select auth.jwt() -> 'app_metadata' ->> 'role') is distinct from 'organizer' then
-    raise exception 'organizer_required';
-  end if;
-  return new;
-end;
-$$;
-
-drop trigger if exists event_registrations_guard_birth_year_update on public.event_registrations;
-create trigger event_registrations_guard_birth_year_update
-before update of attendee_birth_years on public.event_registrations
-for each row execute function public.guard_registration_birth_year_update();
 revoke all on function public.guard_registration_birth_year_update() from public, anon, authenticated;
 grant select on public.events, public.event_activities to anon, authenticated;
 grant select on public.profiles to authenticated;
