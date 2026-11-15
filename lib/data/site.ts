@@ -39,22 +39,27 @@ export type UpcomingEventsResult = {
   error: boolean
 }
 
+export const socialLinks = {
+  whatsapp: 'https://chat.whatsapp.com/L2XBHUHBNFmLEqaIHYERTo?s=cl&p=a&iam=2',
+  instagram: 'https://www.instagram.com/obord_777/',
+} as const
+
 export const organizers: Organizer[] = [
   {
     name: 'Malick',
-    role: 'Collectif',
+    role: 'Organisateur',
     initials: 'MM',
     photo: '/malick.jpeg',
   },
   {
     name: 'Ange Erik',
-    role: 'Collectif',
+    role: 'Organisateur',
     initials: 'AE',
     photo: '/ange-erik.jpeg',
   },
   {
     name: 'Aurore',
-    role: 'Collectif',
+    role: 'Organisateur',
     initials: 'A',
     photo: '/aurore.jpeg',
   },

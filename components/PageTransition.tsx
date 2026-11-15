@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { useLocale } from './LocaleProvider'
 
 function isInternalNavigableLink(target: HTMLAnchorElement | null): target is HTMLAnchorElement {
   if (!target) return false
@@ -15,6 +16,7 @@ function isInternalNavigableLink(target: HTMLAnchorElement | null): target is HT
 }
 
 export default function PageTransition() {
+  const { t } = useLocale()
   const pathname = usePathname()
   const router = useRouter()
   const [, startTransition] = useTransition()
@@ -52,8 +54,8 @@ export default function PageTransition() {
         setLeaving(false)
         setProgress(0)
         startedAt.current = null
-      }, 320)
-    }, Math.max(0, 2680 - elapsed))
+      }, 220)
+    }, Math.max(0, 180 - elapsed))
   }
 
   useEffect(() => {
@@ -107,7 +109,7 @@ export default function PageTransition() {
       <span className="page-transition-bloom" />
       <span className="page-transition-mark"><Image src="/obord-logo.png" alt="" width={74} height={74} priority /></span>
       <span className="page-transition-wave" aria-hidden="true"><span style={{ width: `${progress}%` }} /></span>
-      <span className="page-transition-caption" aria-hidden="true">On se retrouve juste après</span>
+      <span className="page-transition-caption" aria-hidden="true">{t('transition.caption')}</span>
       <span className="sr-only">Chargement {progress}%</span>
     </div>
   )

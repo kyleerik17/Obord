@@ -1,14 +1,18 @@
 import LegalPage from '@/components/LegalPage'
 import { pageMetadata } from '@/lib/metadata'
+import { getLocale } from '@/lib/i18n-server'
+import { translate } from '@/lib/i18n'
 
 export const metadata = pageMetadata('Conditions d’utilisation et de réservation', 'Conditions d’utilisation du site et fonctionnement des réservations aux rencontres O’BORD.')
 
-export default function ConditionsPage() {
-  return <LegalPage title="Conditions d’utilisation et de réservation" intro="Quelques repères pour utiliser le site et réserver une rencontre O’BORD.">
-    <section><h2>Utilisation du site</h2><p>Le site présente le collectif O’BORD et ses rencontres. Les informations d’un événement publié sont consultables sur sa page. Pour le moment, les inscriptions sont réalisées sur la plateforme Tikko.</p></section>
-    <section><h2>Inscriptions</h2><p>Depuis la page d’une rencontre, le bouton d’inscription conduit vers <a href="https://tikko.ci/register">Tikko</a>. Les informations et conditions affichées sur cette plateforme s’appliquent au formulaire d’inscription.</p></section>
-    <section><h2>Âge minimum</h2><p>La participation est réservée aux personnes âgées de 21 ans ou plus. Pour une demande en groupe, chaque participant doit remplir cette condition.</p></section>
-    <section><h2>Informations pratiques</h2><p>Les détails propres à chaque rencontre figurent sur sa page. Le point précis de rendez-vous est communiqué après confirmation. Pour signaler un changement ou poser une question, contacte l’équipe.</p></section>
-    <section><h2>Contact</h2><p>Pour toute question, écris à <a href="mailto:angeerikkyle@gmail.com">angeerikkyle@gmail.com</a> ou appelle le <a href="tel:+2250768963019">+225 07 68 96 30 19</a>.</p></section>
+export default async function ConditionsPage() {
+  const locale = await getLocale()
+  const t = (key: Parameters<typeof translate>[1]) => translate(locale, key)
+  return <LegalPage title={t('legal.terms')} intro={t('legal.termsIntro')}>
+    <section><h2>{t('legal.useTitle')}</h2><p>{t('legal.useText')}</p></section>
+    <section><h2>{t('legal.registrationTitle')}</h2><p>{t('legal.registrationText')} <a href="https://tikko.ci/register">Tikko</a>.</p></section>
+    <section><h2>{t('legal.ageTitle')}</h2><p>{t('legal.ageText')}</p></section>
+    <section><h2>{t('legal.practicalTitle')}</h2><p>{t('legal.practicalText')}</p></section>
+    <section><h2>{t('legal.contactTitle')}</h2><p>{t('legal.contactText')}</p></section>
   </LegalPage>
 }

@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { getSupabaseBrowserClient } from '@/lib/supabase'
 import type { Session } from '@supabase/supabase-js'
+import LanguageSwitcher from './LanguageSwitcher'
+import { useLocale } from './LocaleProvider'
 
 export default function Navbar() {
   const router = useRouter()
@@ -13,6 +15,7 @@ export default function Navbar() {
   const [isSignedIn, setIsSignedIn] = useState(false)
   const [isOrganizer, setIsOrganizer] = useState(false)
   const [signOutError, setSignOutError] = useState('')
+  const { t } = useLocale()
 
   useEffect(() => {
     let active = true
@@ -64,27 +67,28 @@ export default function Navbar() {
             <span>O’BORD</span>
           </Link>
 
-          <div className="hidden items-center space-x-7 md:flex">
-            <Link href="/#ateliers" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">Ateliers</Link>
-            <Link href="/a-propos" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">À propos</Link>
-            <Link href="/blog" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">Blog</Link>
-            <Link href="/#agenda" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">Agenda</Link>
-            <Link href="/contact" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">Contact</Link>
+          <div className="hidden items-center space-x-6 md:flex">
+            <Link href="/#ateliers" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">{t('nav.activities')}</Link>
+            <Link href="/a-propos" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">{t('nav.about')}</Link>
+            <Link href="/blog" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">{t('nav.blog')}</Link>
+            <Link href="/soirees" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">{t('nav.agenda')}</Link>
+            <Link href="/contact" onClick={() => setIsOpen(false)} className="font-medium text-gray-700 hover:text-gray-950">{t('nav.contact')}</Link>
             {isSignedIn ? (
               <div className="flex items-center gap-3">
-                <Link href="/mon-espace" className="font-medium text-gray-700 hover:text-gray-950">Mon espace</Link>
-                {isOrganizer && <Link href="/backoffice" className="font-medium text-gray-700 hover:text-gray-950">Espace équipe</Link>}
-                <button type="button" onClick={signOut} className="rounded-full bg-gray-950 px-4 py-2 font-medium text-white hover:bg-secondary">Déconnexion</button>
+                <Link href="/mon-espace" className="font-medium text-gray-700 hover:text-gray-950">{t('nav.account')}</Link>
+                {isOrganizer && <Link href="/backoffice" className="font-medium text-gray-700 hover:text-gray-950">{t('nav.team')}</Link>}
+                <button type="button" onClick={signOut} className="rounded-full bg-gray-950 px-4 py-2 font-medium text-white hover:bg-secondary">{t('nav.logout')}</button>
               </div>
             ) : (
-              <Link href="/login" className="nav-join-cta rounded-full bg-gray-950 px-4 py-2 font-medium text-white hover:bg-secondary">Rejoindre O’BORD <span aria-hidden="true">↗</span></Link>
+              <Link href="/login" className="nav-join-cta rounded-full bg-gray-950 px-4 py-2 font-medium text-white hover:bg-secondary">{t('nav.join')} <span aria-hidden="true">↗</span></Link>
             )}
+            <LanguageSwitcher />
           </div>
 
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden text-gray-900"
-            aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-label={isOpen ? t('nav.close') : t('nav.open')}
             aria-expanded={isOpen}
             aria-controls="mobile-navigation"
           >
@@ -102,20 +106,21 @@ export default function Navbar() {
       {isOpen && (
         <div id="mobile-navigation" className="nav-mobile-panel border-t border-line bg-white md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1">
-            <Link onClick={() => setIsOpen(false)} href="/#ateliers" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Ateliers</Link>
-            <Link onClick={() => setIsOpen(false)} href="/a-propos" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">À propos</Link>
-            <Link onClick={() => setIsOpen(false)} href="/blog" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Blog</Link>
-            <Link onClick={() => setIsOpen(false)} href="/#agenda" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Agenda</Link>
-            <Link onClick={() => setIsOpen(false)} href="/contact" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Contact</Link>
+            <Link onClick={() => setIsOpen(false)} href="/#ateliers" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">{t('nav.activities')}</Link>
+            <Link onClick={() => setIsOpen(false)} href="/a-propos" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">{t('nav.about')}</Link>
+            <Link onClick={() => setIsOpen(false)} href="/blog" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">{t('nav.blog')}</Link>
+            <Link onClick={() => setIsOpen(false)} href="/soirees" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">{t('nav.agenda')}</Link>
+            <Link onClick={() => setIsOpen(false)} href="/contact" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">{t('nav.contact')}</Link>
             {isSignedIn ? (
               <>
-                <Link onClick={() => setIsOpen(false)} href="/mon-espace" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Mon espace</Link>
-                {isOrganizer && <Link onClick={() => setIsOpen(false)} href="/backoffice" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">Espace équipe</Link>}
-                <button type="button" onClick={signOut} className="block w-full rounded-lg bg-gray-950 px-3 py-2 text-white hover:bg-secondary">Déconnexion</button>
+                <Link onClick={() => setIsOpen(false)} href="/mon-espace" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">{t('nav.account')}</Link>
+                {isOrganizer && <Link onClick={() => setIsOpen(false)} href="/backoffice" className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-950">{t('nav.team')}</Link>}
+                <button type="button" onClick={signOut} className="block w-full rounded-lg bg-gray-950 px-3 py-2 text-white hover:bg-secondary">{t('nav.logout')}</button>
               </>
             ) : (
-              <Link onClick={() => setIsOpen(false)} href="/login" className="nav-join-cta block rounded-lg bg-gray-950 px-3 py-2 text-center text-white hover:bg-secondary">Rejoindre O’BORD <span aria-hidden="true">↗</span></Link>
+              <Link onClick={() => setIsOpen(false)} href="/login" className="nav-join-cta block rounded-lg bg-gray-950 px-3 py-2 text-center text-white hover:bg-secondary">{t('nav.join')} <span aria-hidden="true">↗</span></Link>
             )}
+            <div className="nav-language-mobile"><LanguageSwitcher /></div>
           </div>
         </div>
       )}

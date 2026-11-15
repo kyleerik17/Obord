@@ -2,43 +2,32 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { organizers } from '@/lib/data/site'
 import { pageMetadata } from '@/lib/metadata'
+import { getLocale } from '@/lib/i18n-server'
+import { translate } from '@/lib/i18n'
 
-export const metadata = pageMetadata('Le collectif', 'Rencontre Malick, Ange Erik et Aurore, le collectif O’BORD à Grand-Bassam.')
+export const metadata = pageMetadata('Les organisateurs', 'Rencontre les organisateurs O’BORD à Grand-Bassam.')
 
-export default function Organisateurs() {
+export default async function Organisateurs() {
+  const locale = await getLocale()
+  const t = (key: Parameters<typeof translate>[1]) => translate(locale, key)
   return (
-    <div className="min-h-screen bg-background px-4 py-12">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="font-poppins text-4xl font-semibold tracking-tight text-center mb-4 text-gray-950">
-          Le collectif O’BORD
-        </h1>
-        <p className="font-inter text-xl text-center mb-12 text-gray-600">
-          Malick, Ange Erik et Aurore — le collectif derrière O’BORD.
-        </p>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {organizers.map((org, index) => (
-            <div key={index} className="soft-card rounded-xl overflow-hidden">
-              <div className="relative flex h-64 items-center justify-center overflow-hidden border-b border-line bg-gray-100">
-                {org.photo ? <Image src={org.photo} alt={`Portrait de ${org.name}`} fill sizes="(max-width: 768px) 100vw, 33vw" className={`object-cover ${org.name === 'Aurore' ? 'object-[center_45%]' : 'object-[center_25%]'}`} /> : <span className="flex h-20 w-20 items-center justify-center rounded-full bg-white font-poppins text-2xl font-semibold text-gray-900 shadow-sm">{org.initials}</span>}
-              </div>
-              <div className="p-6">
-                <h2 className="font-poppins text-2xl font-semibold mb-2 text-gray-950">{org.name}</h2>
-                <p className="font-inter text-gray-500 font-semibold mb-4">{org.role}</p>
-              </div>
+    <div className="organizers-page">
+      <header className="editorial-page-heading">
+        <p className="editorial-eyebrow">O’BORD · GRAND-BASSAM</p>
+        <h1>{t('about.teamTitle')}</h1>
+        <p>{t('about.teamIntro')}</p>
+      </header>
+      <div className="organizers-grid">
+        {organizers.map((organizer) => (
+          <article key={organizer.name} className="organizer-card">
+            <div className="organizer-card-image">
+              {organizer.photo && <Image src={organizer.photo} alt={`Portrait de ${organizer.name}`} fill sizes="(max-width: 640px) 90vw, 30vw" className={organizer.name === 'Aurore' ? 'object-cover object-[center_45%]' : 'object-cover object-[center_25%]'} />}
             </div>
-          ))}
-        </div>
-
-        <div className="mt-12 text-center">
-          <Link
-            href="/"
-            className="font-poppins text-gray-700 hover:text-gray-950 font-semibold"
-          >
-            ← Retour à l’accueil
-          </Link>
-        </div>
+            <div className="organizer-card-copy"><h2>{organizer.name}</h2><p>{t('about.organizer')}</p></div>
+          </article>
+        ))}
       </div>
+      <div className="trust-page-actions"><Link href="/contact" className="editorial-button editorial-button-primary">{t('home.contactCta')}</Link><Link href="/" className="editorial-button editorial-button-secondary">{t('common.home')}</Link></div>
     </div>
   )
 }

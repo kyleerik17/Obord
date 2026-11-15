@@ -5,8 +5,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getSupabaseBrowserClient } from '@/lib/supabase'
 import { STRONG_PASSWORD_HINT, STRONG_PASSWORD_PATTERN } from '@/lib/auth/password'
+import { useLocale } from '@/components/LocaleProvider'
 
 export default function Login() {
+  const { t, locale } = useLocale()
   const router = useRouter()
   const [mode, setMode] = useState<'login' | 'signup' | 'reset'>('login')
   const isLogin = mode === 'login'
@@ -22,7 +24,7 @@ export default function Login() {
     setError('')
     setMessage('')
     if (mode === 'signup' && !STRONG_PASSWORD_PATTERN.test(password)) {
-      setError(`Choisis un mot de passe plus robuste : ${STRONG_PASSWORD_HINT}`)
+      setError(`${t('login.passwordWrong')} ${locale === 'fr' ? STRONG_PASSWORD_HINT : t('login.passwordHint')}`)
       return
     }
     setIsSubmitting(true)
@@ -40,10 +42,10 @@ export default function Login() {
           redirectTo: callbackUrl.toString(),
         })
         if (resetError) {
-          setError('La demande n’a pas abouti. Réessaie dans quelques instants.')
+          setError(t('login.requestFailed'))
           return
         }
-        setMessage('Si un compte correspond à cette adresse, un lien de réinitialisation sera envoyé.')
+        setMessage(t('login.resetSent'))
         return
       }
 
@@ -59,7 +61,7 @@ export default function Login() {
           })
 
       if (response.error) {
-        setError('La demande n’a pas abouti. Vérifiez vos informations et réessayez.')
+        setError(t('login.requestFailed'))
         return
       }
 
@@ -71,24 +73,24 @@ export default function Login() {
         router.replace(returnPath)
         router.refresh()
       } else if (isLogin) {
-        setError('La connexion n’a pas pu être établie. Vérifiez vos informations et réessayez.')
+        setError(t('login.loginFailed'))
       } else {
-        setMessage('Demande envoyée. Si une confirmation est requise, consultez votre boîte de réception.')
+        setMessage(t('login.signupSent'))
       }
     } catch {
-      setError('Le service est momentanément indisponible. Réessayez dans quelques instants.')
+      setError(t('login.unavailable'))
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-background">
-      <div className="soft-card max-w-md w-full rounded-xl p-8">
+    <div className="login-page">
+      <div className="login-card">
         <div className="text-center mb-8">
-          <h1 className="font-poppins text-4xl font-semibold tracking-tight text-gray-950 mb-2">O’BORD</h1>
+          <h1 className="font-poppins text-4xl font-semibold tracking-tight text-gray-950 mb-2">{t('login.title')}</h1>
           <p className="font-inter text-gray-600">
-            {isLogin ? 'On reprend le fil ? Connecte-toi pour retrouver tes réservations.' : mode === 'signup' ? 'Un premier pas pour préparer ta prochaine rencontre.' : 'On t’aide à retrouver le chemin de ton compte.'}
+            {isLogin ? t('login.intro') : mode === 'signup' ? t('login.signupIntro') : t('login.resetIntro')}
           </p>
         </div>
 
@@ -96,7 +98,7 @@ export default function Login() {
           {mode === 'signup' && (
             <div>
               <label htmlFor="name" className="font-poppins block text-sm font-medium text-gray-700 mb-2">
-                Nom complet
+                {t('login.name')}
               </label>
               <input
                 type="text"
@@ -113,8 +115,8 @@ export default function Login() {
           )}
 
           <div>
-            <label htmlFor="email" className="font-poppins block text-sm font-medium text-gray-700 mb-2">
-              Email
+              <label htmlFor="email" className="font-poppins block text-sm font-medium text-gray-700 mb-2">
+                {t('login.email')}
             </label>
             <input
               type="email"
@@ -124,7 +126,7 @@ export default function Login() {
               autoComplete="email"
               maxLength={254}
               className="font-inter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition"
-              placeholder="votre@email.com"
+                placeholder={locale === 'fr' ? 'toi@exemple.com' : 'you@example.com'}
               required
             />
           </div>
@@ -132,7 +134,7 @@ export default function Login() {
           {mode !== 'reset' && (
             <div>
               <label htmlFor="password" className="font-poppins block text-sm font-medium text-gray-700 mb-2">
-                Mot de passe
+                {t('login.password')}
               </label>
               <input
                 type="password"
@@ -149,13 +151,13 @@ export default function Login() {
                 placeholder="••••••••"
                 required
               />
-              {mode === 'signup' && <p id="password-strength-help" className="mt-2 text-xs leading-relaxed text-gray-600">{STRONG_PASSWORD_HINT}</p>}
+              {mode === 'signup' && <p id="password-strength-help" className="mt-2 text-xs leading-relaxed text-gray-600">{locale === 'fr' ? STRONG_PASSWORD_HINT : t('login.passwordHint')}</p>}
             </div>
           )}
 
           {mode === 'login' && (
             <button type="button" onClick={() => setMode('reset')} className="-mt-3 font-poppins text-sm font-semibold text-gray-700 hover:text-gray-950">
-              Mot de passe oublié ?
+              {t('login.forgot')}
             </button>
           )}
 
@@ -164,7 +166,7 @@ export default function Login() {
             disabled={isSubmitting}
             className="font-poppins w-full rounded-lg bg-gray-950 py-3 font-semibold text-white hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isSubmitting ? 'On prépare la suite…' : isLogin ? 'Retrouver mes réservations' : mode === 'signup' ? 'Créer mon compte O’BORD' : 'M’envoyer le lien'}
+            {isSubmitting ? t('common.loading') : isLogin ? t('login.submit') : mode === 'signup' ? t('login.signup') : t('login.reset')}
           </button>
         </form>
 
@@ -183,10 +185,10 @@ export default function Login() {
         <div className="mt-6 text-center">
           {isLogin ? (
             <div className="flex flex-col gap-3">
-              <button type="button" onClick={() => setMode('signup')} className="font-poppins text-gray-700 hover:text-gray-950 font-semibold">Nouveau chez O’BORD ? Créer mon compte</button>
+              <button type="button" onClick={() => setMode('signup')} className="font-poppins text-gray-700 hover:text-gray-950 font-semibold">{t('login.createQuestion')}</button>
             </div>
           ) : (
-            <button type="button" onClick={() => setMode('login')} className="font-poppins text-gray-700 hover:text-gray-950 font-semibold">Retour à la connexion</button>
+            <button type="button" onClick={() => setMode('login')} className="font-poppins text-gray-700 hover:text-gray-950 font-semibold">{t('login.return')}</button>
           )}
         </div>
 
@@ -195,7 +197,7 @@ export default function Login() {
             href="/"
             className="font-inter text-gray-600 hover:text-gray-950"
           >
-            ← Retour à l’accueil
+            {t('common.home')}
           </Link>
         </div>
       </div>

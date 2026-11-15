@@ -2,83 +2,96 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getUpcomingEvents } from '@/lib/data/events'
 import { pageMetadata } from '@/lib/metadata'
+import { getLocale } from '@/lib/i18n-server'
+import { translate } from '@/lib/i18n'
 
-export const metadata = pageMetadata('La maison du chill', 'Le collectif O’BORD à Grand-Bassam : jeux, rencontres et sorties conviviales.')
+export const metadata = pageMetadata('La maison du chill', 'Jeux et rencontres à Grand-Bassam, à vivre à ton rythme avec O’BORD.')
 
-const games = [
-  { number: '01', title: 'La Table', tag: 'JEUX DE SOCIÉTÉ', text: 'Des jeux faciles à découvrir pour rire et faire connaissance.', action: 'Rejoindre la table', color: 'lilac', shape: 'board' },
-  { number: '02', title: 'Le Salon', tag: 'RENCONTRES', text: 'Un moment pour discuter et rencontrer de nouvelles personnes.', action: 'Faire connaissance', color: 'coral', shape: 'dice' },
-  { number: '03', title: 'Le Terrain', tag: 'JEUX EN GROUPE', text: 'Des activités et des défis à partager ensemble.', action: 'Relever le défi', color: 'yellow', shape: 'wood' },
-  { number: '04', title: 'Le Feu & la Plage', tag: 'PLEIN AIR', text: 'Une sortie en plein air pour profiter du moment et de la plage.', action: 'Profiter du moment', color: 'blue', shape: 'escape' },
-]
-
-const stats = [
-  { number: 'RENCONTRER', label: 'faire connaissance, naturellement' },
-  { number: 'JOUER', label: 'créer des liens en faisant' },
-  { number: 'CHILLER', label: 'profiter, à son propre rythme' },
-]
-
-function Arrow({ diagonal = false }: { diagonal?: boolean }) {
-  return <span aria-hidden="true" className="inline-block transition-transform duration-300 group-hover:translate-x-1">{diagonal ? '↗' : '→'}</span>
-}
-
-function WorkshopIcon({ shape }: { shape: string }) {
-  return (
-    <div aria-hidden="true" className={`workshop-art art-${shape}`}>
-      {shape === 'board' && <div className="board-piece"><i /><i /><i /><i /></div>}
-      {shape === 'dice' && <div className="die"><i /></div>}
-      {shape === 'wood' && <div className="wood-stack"><i /><i /><i /></div>}
-      {shape === 'escape' && <div className="escape-orbit"><i>?</i></div>}
-    </div>
-  )
-}
-
-function Ticket({ id, title, day, month, time, index, capacity, remainingSeats }: { id: string; title: string; day: string; month: string; time: string; index: number; capacity: number | null; remainingSeats: number | null }) {
-  return (
-    <article className="event-ticket" style={{ animationDelay: `${index * 120}ms` }}>
-      <div className="event-date"><span>{month}</span><strong>{day}</strong></div>
-      <div className="event-copy"><span className="event-label">RENDEZ-VOUS O’BORD</span><h3>{title}</h3><p>⌁ &nbsp; {time}</p>{capacity !== null && remainingSeats !== null && <small className="ticket-places">{remainingSeats > 0 ? `${remainingSeats} place${remainingSeats > 1 ? 's' : ''} restante${remainingSeats > 1 ? 's' : ''}` : 'Complet'}</small>}</div>
-      <Link className="ticket-arrow" href={`/soirees?plan=${encodeURIComponent(id)}`} aria-label={`Découvrir ${title}`}><span>Découvrir</span><Arrow diagonal /></Link>
-    </article>
-  )
-}
+const activities = [
+  { title: 'home.card1title', tag: 'home.card1tag', text: 'home.card1text', action: 'home.card1action', number: '01', icon: '✳' },
+  { title: 'home.card2title', tag: 'home.card2tag', text: 'home.card2text', action: 'home.card2action', number: '02', icon: '◌' },
+  { title: 'home.card3title', tag: 'home.card3tag', text: 'home.card3text', action: 'home.card3action', number: '03', icon: '⌁' },
+  { title: 'home.card4title', tag: 'home.card4tag', text: 'home.card4text', action: 'home.card4action', number: '04', icon: '☼' },
+] as const
 
 export default async function Home() {
-  const { events: scheduledEvents, error: scheduleError } = await getUpcomingEvents()
-  const upcomingEvents = scheduledEvents.slice(0, 3)
+  const [locale, agenda] = await Promise.all([getLocale(), getUpcomingEvents()])
+  const upcomingEvents = agenda.events.slice(0, 3)
+  const t = (key: Parameters<typeof translate>[1]) => translate(locale, key)
 
   return (
-    <div className="ob-home">
-      {/* Hero: a made-for-O'BORD typographic poster, with no placeholder photography. */}
-      <section className="hero-section" id="accueil">
-        <div className="hero-noise" aria-hidden="true" />
-        <div className="hero-content">
-          <h1>Des jeux, des rencontres,<br /><span className="hero-last">et du chill<span className="hero-period">.</span></span></h1>
-          <div className="hero-bottom">
-            <div><span className="hero-tag">O’BORD · GRAND-BASSAM</span><p>Des rencontres autour du jeu, pour faire connaissance à ton rythme.<br />Viens seul·e ou avec ta bande.</p></div>
-            <div className="hero-actions"><Link href="/soirees" className="button-primary group">Voir les prochaines rencontres <Arrow diagonal /></Link><Link href="#ateliers" data-no-progress="true" className="button-quiet">Découvrir les activités <Arrow /></Link></div>
+    <div className="ob-home editorial-home">
+      <section className="home-hero" id="accueil">
+        <div className="home-hero-copy">
+          <p className="editorial-eyebrow">{t('home.eyebrow')}</p>
+          <h1>{t('home.title1')}<br /><span>{t('home.title2')}</span></h1>
+          <p className="home-hero-intro">{t('home.intro')}</p>
+          <p className="home-hero-location"><span className="location-dot" aria-hidden="true" />{t('home.location')} · Grand-Bassam</p>
+          <div className="home-hero-actions">
+            <Link className="editorial-button editorial-button-primary" href="/soirees">{t('home.primary')}</Link>
+            <Link className="editorial-button editorial-button-secondary" href="#ateliers">{t('home.secondary')}</Link>
           </div>
         </div>
-        <div className="hero-art" aria-hidden="true"><div className="hero-orbit orbit-one" /><div className="hero-orbit orbit-two" /><div className="hero-disc"><Image src="/obord-logo.png" alt="" fill sizes="(max-width: 640px) 180px, 360px" priority /></div><div className="hero-caption">LA MAISON DU CHILL <span>·</span> GRAND-BASSAM</div></div>
-        <div className="hero-rail" aria-hidden="true"><span>VIENS COMME TU ES</span><span>LA RENCONTRE SANS PRESSION</span><span>VIENS COMME TU ES</span></div>
+        <div className="home-hero-mark" aria-hidden="true"><Image src="/obord-logo.png" alt="" fill priority sizes="(max-width: 760px) 190px, 390px" /></div>
+        <p className="home-hero-index">O’BORD <span>—</span> LA MAISON DU CHILL</p>
       </section>
 
-      {/* Four illustrated workshop cards introduce the collective's activities. */}
-      <section className="workshop-section section-wrap" id="ateliers" data-reveal>
-        <div className="section-heading"><div><p className="eyebrow eyebrow-dark">DES PRÉTEXTES À LA RENCONTRE</p><h2>Il y a mille façons de <span>se retrouver.</span></h2></div><p className="section-intro">Un jeu pour briser la glace, une activité pour rire ensemble, ou juste un endroit où se poser. Choisis ce qui te ressemble.</p></div>
-        <div className="workshop-grid">{games.map((game, index) => <article key={game.number} data-reveal data-reveal-delay={index * 90} className={`workshop-card card-${game.color}`}><div className="card-topline"><span>{game.number} / ATELIER</span></div><WorkshopIcon shape={game.shape} /><div className="card-copy"><span className="card-tag">{game.tag}</span><h3>{game.title}</h3><p>{game.text}</p><Link className="card-link group" href="/soirees">{game.action} <Arrow diagonal /></Link></div></article>)}</div>
+      <section className="home-activities editorial-section" id="ateliers" aria-labelledby="activities-title">
+        <div className="editorial-section-heading">
+          <div><p className="editorial-eyebrow">{t('home.activitiesEyebrow')}</p><h2 id="activities-title">{t('home.activitiesTitle')}</h2></div>
+          <p>{t('home.activitiesIntro')}</p>
+        </div>
+        <div className="activity-grid">
+          {activities.map((activity) => (
+            <article className="activity-card" key={activity.number}>
+              <div className="activity-card-top"><span>{activity.number}</span><span className="activity-card-icon" aria-hidden="true">{activity.icon}</span></div>
+              <p className="activity-card-tag">{t(activity.tag)}</p>
+              <h3>{t(activity.title)}</h3>
+              <p className="activity-card-description">{t(activity.text)}</p>
+              <Link href="/soirees" className="editorial-text-link">{t(activity.action)}</Link>
+            </article>
+          ))}
+        </div>
       </section>
 
-      {/* A compact social-proof band, expressed in the palette. */}
-      <section className="stats-band" aria-label="Les trois dimensions de l’expérience O’BORD" data-reveal><div className="stats-inner">{stats.map((stat, index) => <div className={`stat stat-${index + 1}`} key={stat.number}><p><strong>{stat.number}</strong><span>{stat.label}</span></p></div>)}</div><span className="stats-note">PAS BESOIN DE SAVOIR JOUER. IL SUFFIT DE VENIR. <span>→</span></span></section>
+      <section className="home-reassurance" aria-label="À quoi s’attendre">
+        {([1, 2, 3] as const).map((number) => (
+          <article key={number}><span className="reassurance-number">0{number}</span><div><h3>{t(`home.reassurance${number}` as Parameters<typeof translate>[1])}</h3><p>{t(`home.reassurance${number}text` as Parameters<typeof translate>[1])}</p></div></article>
+        ))}
+      </section>
 
-      {/* Event dates reuse the site's real event data and point to its existing sign-up flow. */}
-      <section className="agenda-section section-wrap" id="agenda" data-reveal><div className="agenda-head"><div><p className="eyebrow eyebrow-dark">LES RENCONTRES O’BORD</p><h2>On se voit <span>bientôt ?</span></h2><p className="agenda-lead">Choisis une date, réserve ta place et retrouve ici les informations pratiques.</p></div><Link className="agenda-all group" href="/soirees">Voir toutes les rencontres <Arrow diagonal /></Link></div>{upcomingEvents.length ? <><div className="event-list">{upcomingEvents.map((event, index) => { const date = new Date(`${event.date}T12:00:00`); return <Ticket key={event.id} id={event.id} index={index} title={event.title} day={new Intl.DateTimeFormat('fr-FR', { day: '2-digit' }).format(date)} month={new Intl.DateTimeFormat('fr-FR', { month: 'short' }).format(date).replace('.', '').toUpperCase()} time={event.time} capacity={event.capacity} remainingSeats={event.remainingSeats} /> })}</div><div className="agenda-bottom"><Link href="/soirees" className="button-primary group">Je choisis ma rencontre <Arrow diagonal /></Link></div></> : <div className="agenda-empty"><span aria-hidden="true">☀</span><div><h3>{scheduleError ? 'Les rencontres ne sont pas disponibles pour le moment.' : 'Aucune nouvelle date annoncée pour le moment.'}</h3><p>{scheduleError ? 'Un souci technique empêche le chargement de l’agenda. Réessaie un peu plus tard.' : 'Les informations des prochaines rencontres seront affichées ici quand elles seront confirmées.'}</p><Link href={scheduleError ? '/contact' : '/videos'}>{scheduleError ? 'Écrire à l’équipe' : 'Revoir les souvenirs O’BORD'} <Arrow diagonal /></Link></div></div>}<div className="agenda-steps" aria-label="Comment participer"><article><span>01</span><div><strong>Tu choisis</strong><p>Une rencontre qui te donne envie.</p></div></article><article><span>02</span><div><strong>Tu réserves</strong><p>En solo ou avec ton groupe.</p></div></article><article><span>03</span><div><strong>On se retrouve</strong><p>L’équipe t’envoie les détails utiles.</p></div></article></div></section>
+      <section className="home-agenda editorial-section" id="agenda" aria-labelledby="agenda-title">
+        <div className="editorial-section-heading">
+          <div><p className="editorial-eyebrow">{t('home.agendaEyebrow')}</p><h2 id="agenda-title">{t('home.agendaTitle')}</h2><p className="editorial-section-intro">{t('home.agendaIntro')}</p></div>
+          <Link className="editorial-button editorial-button-secondary" href="/soirees">{t('home.allMeetups')}</Link>
+        </div>
+        {upcomingEvents.length ? (
+          <div className="home-event-list">
+            {upcomingEvents.map((event) => {
+              const date = new Date(`${event.date}T12:00:00`)
+              const dateLabel = new Intl.DateTimeFormat(locale === 'en' ? 'en-GB' : locale === 'es' ? 'es-ES' : 'fr-FR', { day: 'numeric', month: 'long', timeZone: 'Africa/Abidjan' }).format(date)
+              return <article className="home-event-card" key={event.id}>
+                <div className="home-event-date"><span>{dateLabel}</span><span>{event.time}</span></div>
+                <div className="home-event-copy"><h3>{event.title}</h3><p>{event.venueArea}{event.venueName ? ` · ${event.venueName}` : ''}</p></div>
+                <Link href={`/soirees?plan=${encodeURIComponent(event.id)}`} className="editorial-button editorial-button-primary">{t('common.learnMore')}</Link>
+              </article>
+            })}
+          </div>
+        ) : (
+          <div className="home-agenda-empty"><div><span className="home-empty-mark" aria-hidden="true">O’</span><p className="editorial-eyebrow">{t('home.agendaEyebrow')}</p><h3>{agenda.error ? t('home.errorTitle') : t('home.emptyTitle')}</h3><p>{agenda.error ? t('home.errorText') : t('home.emptyText')}</p></div><div className="home-agenda-empty-actions"><Link className="editorial-button editorial-button-primary" href="/videos">{t('home.memories')}</Link><Link className="editorial-text-link" href="/contact">{t('home.contactCta')}</Link></div></div>
+        )}
+        <div className="home-how-it-works"><h3>{t('home.stepsTitle')}</h3><div>{([1, 2, 3] as const).map((number) => <article key={number}><span>0{number}</span><div><strong>{t(`home.step${number}` as Parameters<typeof translate>[1])}</strong><p>{t(`home.step${number}text` as Parameters<typeof translate>[1])}</p></div></article>)}</div></div>
+      </section>
 
-      {/* A direct invitation leads into the existing organizer contact and video pages. */}
-      <section className="about-section" id="collectif" data-reveal><div className="about-inner"><div className="about-stamp" aria-hidden="true"><span>FAIRE GROUPE</span><b>O’B<br />ORD</b><span>FAIRE JEU</span></div><div className="about-copy"><p className="eyebrow">LA MAISON DU CHILL</p><h2>Un endroit où<br />arriver <span>comme on est.</span></h2><p>À Grand-Bassam, O’BORD propose des occasions de se retrouver autour de jeux, d’activités et de sorties. Chacun peut participer, observer, jouer ou discuter à son rythme, dans une ambiance détendue.</p><div className="about-actions"><Link className="button-primary group" href="/organisateurs">Rencontrer le collectif <Arrow diagonal /></Link><Link className="button-quiet" href="/videos">Voir l’ambiance en vidéo <Arrow /></Link></div></div></div><div className="about-scribble" aria-hidden="true">viens comme tu es <span>↗</span></div></section>
+      <section className="home-story">
+        <div className="home-story-mark" aria-hidden="true"><Image src="/obord-logo.png" alt="" fill sizes="(max-width: 760px) 96px, 140px" /></div>
+        <div><p className="editorial-eyebrow">O’BORD · GRAND-BASSAM</p><h2>{t('home.storyTitle')}</h2><p>{t('home.storyText')}</p><Link className="editorial-text-link" href="/a-propos">{t('common.learnMore')}</Link></div>
+      </section>
 
-      <section className="newsletter-section" id="contact" data-reveal><div className="newsletter-inner"><div><p className="eyebrow">ON GARDE LE LIEN</p><h2>Une question ?<br /><span>On est là.</span></h2><p>Tu veux en savoir plus avant de venir ? Écris-nous, on prendra le temps de te répondre.</p></div><div className="home-contact-card"><span>Un premier bonjour, ça commence ici.</span><Link href="/organisateurs">Rencontrer le collectif <Arrow diagonal /></Link><Link href="/contact">Écrire au collectif <Arrow diagonal /></Link></div></div></section>
+      <section className="home-contact">
+        <div><p className="editorial-eyebrow">O’BORD · GRAND-BASSAM</p><h2>{t('home.contactTitle')}</h2><p>{t('home.contactText')}</p></div>
+        <Link className="editorial-button editorial-button-primary" href="/contact">{t('home.contactCta')}</Link>
+      </section>
     </div>
   )
 }

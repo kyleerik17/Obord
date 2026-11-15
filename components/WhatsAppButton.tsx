@@ -1,8 +1,10 @@
+import { socialLinks } from '@/lib/data/site'
+
 export default function WhatsAppButton() {
   return (
     <a
       className="whatsapp-float"
-      href="https://wa.me/2250768963019?text=Bonjour%20O%27Bord%2C%20je%20souhaite%20plus%20d%27informations"
+      href={socialLinks.whatsapp}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contacter O’BORD sur WhatsApp"
