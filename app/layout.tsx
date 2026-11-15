@@ -12,6 +12,8 @@ import { LocaleProvider } from "@/components/LocaleProvider";
 import { getPublicSiteUrl } from "@/lib/metadata";
 import { getLocale } from "@/lib/i18n-server";
 import { socialLinks } from "@/lib/data/site";
+import { getTheme } from "@/lib/theme-server";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const dancingScript = Dancing_Script({
   variable: "--font-dancing",
@@ -55,6 +57,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   await connection();
   const locale = await getLocale();
+  const theme = await getTheme();
   const requestHeaders = await headers();
   const nonce = requestHeaders.get("x-nonce") ?? undefined;
   const localBusiness = {
@@ -75,16 +78,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang={locale}
+      data-theme={theme}
       className={`${dancingScript.variable} ${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-display" suppressHydrationWarning>
         <LocaleProvider initialLocale={locale}>
-          <PageTransition />
-          <Navbar />
-          <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusiness) }} />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-          <WhatsAppButton />
+          <ThemeProvider initialTheme={theme}>
+            <PageTransition />
+            <Navbar />
+            <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusiness) }} />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+            <WhatsAppButton />
+          </ThemeProvider>
         </LocaleProvider>
       </body>
     </html>

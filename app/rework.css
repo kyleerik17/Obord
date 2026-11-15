@@ -44,6 +44,11 @@ nav[aria-label="Navigation principale"] > div > div > div a:not(.nav-join-cta):h
 .language-switcher { display: inline-flex; align-items: center; }
 .language-switcher select { min-height: 40px; padding: 0 30px 0 11px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--foreground); font: 650 11px var(--font-inter), sans-serif; cursor: pointer; }
 .language-switcher select:hover { border-color: var(--primary); }
+.theme-toggle { display: inline-grid; width: 42px; height: 42px; flex: none; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--foreground); cursor: pointer; }
+.theme-toggle:hover { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, transparent); }
+.theme-toggle svg { width: 19px; height: 19px; }
+.navbar-mobile-actions { display: flex; align-items: center; gap: 8px; }
+.navbar-mobile-actions > button:not(.theme-toggle) { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; }
 .nav-language-mobile { padding: 10px 12px 4px; }
 .nav-language-mobile .language-switcher select { width: 100%; border-radius: var(--radius-control); }
 nav[aria-label="Navigation principale"] button.md\:hidden { min-width: 44px; min-height: 44px; border-radius: 50%; }
@@ -374,3 +379,128 @@ body:has(.editorial-home) .site-footer { border-color: var(--line) !important; b
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* User controlled dark theme, shared across public pages, forms and the team area. */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #17161b;
+  --foreground: #f2f0f6;
+  --muted: #b4b0be;
+  --surface: #222127;
+  --line: #3a3842;
+  --shadow-soft: 0 10px 34px rgb(0 0 0 / 22%);
+}
+html[data-theme="dark"] body,
+html[data-theme="dark"] .trust-page,
+html[data-theme="dark"] .blog-page,
+html[data-theme="dark"] .blog-article-page,
+html[data-theme="dark"] .member-page,
+html[data-theme="dark"] .backoffice-page,
+html[data-theme="dark"] .login-page,
+html[data-theme="dark"] .place-page,
+html[data-theme="dark"] .organizers-page,
+html[data-theme="dark"] .soirees-page,
+html[data-theme="dark"] .editorial-home { background: var(--background) !important; color: var(--foreground); }
+html[data-theme="dark"] nav[aria-label="Navigation principale"],
+html[data-theme="dark"] body:has(.editorial-home) nav[aria-label="Navigation principale"] { border-color: var(--line) !important; background: rgb(28 27 33 / 94%) !important; color: var(--foreground) !important; }
+html[data-theme="dark"] nav[aria-label="Navigation principale"] a,
+html[data-theme="dark"] nav[aria-label="Navigation principale"] button { color: var(--foreground) !important; }
+html[data-theme="dark"] .nav-mobile-panel { border-color: var(--line); background: #222127; }
+html[data-theme="dark"] .home-hero,
+html[data-theme="dark"] .home-reassurance,
+html[data-theme="dark"] .home-story,
+html[data-theme="dark"] .soirees-hero,
+html[data-theme="dark"] .trust-hero,
+html[data-theme="dark"] .blog-hero { background: #201f26 !important; color: var(--foreground); }
+html[data-theme="dark"] .home-hero-intro,
+html[data-theme="dark"] .home-hero-location,
+html[data-theme="dark"] .home-story p,
+html[data-theme="dark"] .trust-hero > p:last-child,
+html[data-theme="dark"] .blog-hero > p:last-child,
+html[data-theme="dark"] .soirees-hero-copy > p:not(.soirees-kicker) { color: #c3bfcb; }
+html[data-theme="dark"] .home-story h2,
+html[data-theme="dark"] .home-hero h1,
+html[data-theme="dark"] .soirees-hero h1 { color: var(--foreground); }
+html[data-theme="dark"] .activity-card,
+html[data-theme="dark"] .home-event-card,
+html[data-theme="dark"] .home-agenda-empty,
+html[data-theme="dark"] .soirees-event-card,
+html[data-theme="dark"] .soirees-event-body,
+html[data-theme="dark"] .soirees-program-pending,
+html[data-theme="dark"] .event-practical-card,
+html[data-theme="dark"] .event-availability,
+html[data-theme="dark"] .registration-section,
+html[data-theme="dark"] .registration-redirect-card,
+html[data-theme="dark"] .next-meetup-note,
+html[data-theme="dark"] .video-memory,
+html[data-theme="dark"] .trust-card,
+html[data-theme="dark"] .login-card,
+html[data-theme="dark"] .legal-content,
+html[data-theme="dark"] .faq-item,
+html[data-theme="dark"] .blog-card,
+html[data-theme="dark"] .blog-empty,
+html[data-theme="dark"] .video-empty-state,
+html[data-theme="dark"] .organizer-card,
+html[data-theme="dark"] .member-summary,
+html[data-theme="dark"] .member-reservation-card,
+html[data-theme="dark"] .backoffice-category,
+html[data-theme="dark"] .backoffice-reservation,
+html[data-theme="dark"] .backoffice-event-card,
+html[data-theme="dark"] .backoffice-photo-event,
+html[data-theme="dark"] .backoffice-category-card,
+html[data-theme="dark"] .backoffice-category-nav,
+html[data-theme="dark"] .soft-card,
+html[data-theme="dark"] .contact-detail-static,
+html[data-theme="dark"] .map-card,
+html[data-theme="dark"] .site-footer { border-color: var(--line) !important; background: var(--surface) !important; color: var(--foreground); box-shadow: var(--shadow-soft); }
+html[data-theme="dark"] .soirees-event-head { background: #302e38; color: var(--foreground); }
+html[data-theme="dark"] .soirees-event-meta span,
+html[data-theme="dark"] .soirees-program-pin { border-color: #494651; background: #26242c; color: #efedf4; }
+html[data-theme="dark"] .soirees-event-description,
+html[data-theme="dark"] .soirees-program-title,
+html[data-theme="dark"] .soirees-program-copy .font-poppins,
+html[data-theme="dark"] .registration-redirect-copy strong,
+html[data-theme="dark"] .registration-redirect .registration-intro h2,
+html[data-theme="dark"] .organizer-card h2,
+html[data-theme="dark"] .blog-admin-list h3 { color: #f0eef5 !important; }
+html[data-theme="dark"] .soirees-program-copy .text-gray-600,
+html[data-theme="dark"] .registration-redirect-copy p,
+html[data-theme="dark"] .registration-redirect .registration-intro > p:last-child,
+html[data-theme="dark"] .trust-card p,
+html[data-theme="dark"] .legal-content p,
+html[data-theme="dark"] .legal-content li,
+html[data-theme="dark"] .faq-answer p,
+html[data-theme="dark"] .organizer-card p,
+html[data-theme="dark"] .contact-details > a,
+html[data-theme="dark"] .contact-form label,
+html[data-theme="dark"] .blog-card p,
+html[data-theme="dark"] .home-how-it-works p { color: #c3bfcb !important; }
+html[data-theme="dark"] .soirees-program-pending strong { color: #f0eef5; }
+html[data-theme="dark"] .site-footer,
+html[data-theme="dark"] body:has(.ob-home) .site-footer { background: #1e1d23 !important; color: #e7e4ec !important; }
+html[data-theme="dark"] .site-footer a,
+html[data-theme="dark"] .site-footer p,
+html[data-theme="dark"] .site-footer-bottom { color: #c3bfcb !important; }
+html[data-theme="dark"] .site-footer-title,
+html[data-theme="dark"] .site-footer h2 { color: #f0eef5 !important; }
+html[data-theme="dark"] main .text-gray-950,
+html[data-theme="dark"] main .text-gray-900,
+html[data-theme="dark"] main .text-gray-800,
+html[data-theme="dark"] main .text-gray-700,
+html[data-theme="dark"] main .text-gray-600,
+html[data-theme="dark"] main .text-gray-500 { color: #d3cfda !important; }
+html[data-theme="dark"] main button.bg-gray-950,
+html[data-theme="dark"] main a.bg-gray-950 { color: #fff !important; }
+html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select { border-color: #4b4854 !important; background-color: #1b1a20 !important; color: #f2f0f6 !important; color-scheme: dark; }
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder { color: #a7a2b0; }
+html[data-theme="dark"] .language-switcher select option { background: #222127; color: #f2f0f6; }
+html[data-theme="dark"] .login-card .text-red-700 { color: #ffb4ad; }
+html[data-theme="dark"] .login-card .text-green-700 { color: #9fe0b2; }
+html[data-theme="dark"] .login-card .bg-red-50 { background: #452a2c; }
+html[data-theme="dark"] .login-card .bg-green-50 { background: #20372a; }
+html[data-theme="dark"] .whatsapp-float { border-color: var(--line); background: #29272f; color: #f2f0f6; }
+html[data-theme="dark"] .page-transition-bloom { background: #17161b; }
+@media (prefers-reduced-motion: reduce) { .theme-toggle { transition: none; } }

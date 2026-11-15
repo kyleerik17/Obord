@@ -8,6 +8,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase'
 import type { Session } from '@supabase/supabase-js'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useLocale } from './LocaleProvider'
+import ThemeToggle from './ThemeToggle'
 
 export default function Navbar() {
   const router = useRouter()
@@ -83,23 +84,27 @@ export default function Navbar() {
               <Link href="/login" className="nav-join-cta rounded-full bg-gray-950 px-4 py-2 font-medium text-white hover:bg-secondary">{t('nav.join')} <span aria-hidden="true">↗</span></Link>
             )}
             <LanguageSwitcher />
+            <ThemeToggle />
           </div>
 
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-gray-900"
-            aria-label={isOpen ? t('nav.close') : t('nav.open')}
-            aria-expanded={isOpen}
-            aria-controls="mobile-navigation"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
+          <div className="navbar-mobile-actions md:hidden">
+            <ThemeToggle />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-gray-900"
+              aria-label={isOpen ? t('nav.close') : t('nav.open')}
+              aria-expanded={isOpen}
+              aria-controls="mobile-navigation"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
