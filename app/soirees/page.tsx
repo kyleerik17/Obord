@@ -32,6 +32,6 @@ export default async function Soirees() {
     count: t('explorer.count'), open: t('explorer.open'), join: t('explorer.join'), close: t('explorer.close'),
     contact: t('home.contactCta'), memories: t('home.memories'), noCapacity: t('explorer.noCapacity'), remaining: t('soirees.remaining'), full: t('soirees.full'),
     venue: t('soirees.venue'), contribution: t('soirees.participation'), schedule: t('soirees.schedule'), typeOuting: t('soirees.outing'), typeWorkshop: t('soirees.workshop'),
-    errorTitle: t('soirees.errorTitle'), errorText: t('soirees.errorText'), emptyAgendaTitle: t('soirees.emptyTitle'), emptyAgendaText: t('soirees.emptyText'),
+    errorTitle: t('soirees.errorTitle'), errorText: t('soirees.errorText'), emptyAgendaTitle: t('soirees.emptyTitle'),
   }} />
 }

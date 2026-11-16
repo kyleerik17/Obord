@@ -562,6 +562,7 @@ html[data-theme="dark"] .page-transition-bloom { background: #111115; }
 .explorer-empty-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 13px; margin-top: 8px; }
 .explorer-empty-secondary { display: inline-flex; min-height: 46px; align-items: center; padding: 0 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); color: var(--foreground); font-size: 12px; font-weight: 700; }
 .explorer-empty-secondary:hover { border-color: var(--primary); color: var(--primary); }
+.explorer-no-events { margin: 28px 0; color: var(--foreground); font-size: clamp(18px, 2vw, 24px); font-weight: 650; text-align: center; }
 .explorer-results-label { color: #56545c; }
 .ob-photo-carousel-arrows button:focus-visible,
 .ob-photo-carousel-dots button:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 60%, white); outline-offset: 3px; }

@@ -17,26 +17,44 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
   const [error, setError] = useState(authFailed ? t('login.callbackFailed') : '')
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<'email' | 'password', string>>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const getAuthErrorMessage = (code: string | undefined, message: string, status: number) => {
-    if (status === 429) return t('login.rateLimited')
-    if (code === 'email_not_confirmed') return t('login.emailNotConfirmed')
-    if (code === 'invalid_credentials') return t('login.badCredentials')
-    if (code === 'email_exists' || code === 'user_already_exists') return t('login.emailExists')
-    if (code === 'weak_password' || code === 'password_too_weak') return t('login.weakPassword')
-    if (code === 'signup_disabled') return t('login.signupDisabled')
-    if (code?.includes('redirect') || message.toLowerCase().includes('redirect')) return t('login.redirectNotAllowed')
-    if (status >= 500) return t('login.unavailable')
-    return t('login.requestFailed')
+  const handleAuthError = (code: string | undefined, message: string, status: number, isLoginRequest: boolean) => {
+    const details = message.toLowerCase()
+    if (status === 429) {
+      setError(t('login.rateLimited'))
+    } else if (code === 'invalid_credentials' && isLoginRequest) {
+      setFieldErrors({ email: t('login.emailCheck'), password: t('login.passwordCheck') })
+    } else if (code === 'email_not_confirmed' || code === 'email_address_invalid' || code === 'email_exists' || code === 'user_already_exists' || details.includes('email')) {
+      setFieldErrors({ email: code === 'email_not_confirmed' ? t('login.emailNotConfirmed') : code === 'email_exists' || code === 'user_already_exists' ? t('login.emailExists') : t('login.emailCheck') })
+    } else if (code === 'weak_password' || code === 'password_too_weak' || details.includes('password')) {
+      setFieldErrors({ password: t('login.weakPassword') })
+    } else if (code === 'signup_disabled') {
+      setError(t('login.signupDisabled'))
+    } else if (code?.includes('redirect') || details.includes('redirect')) {
+      setError(t('login.redirectNotAllowed'))
+    } else if (status >= 500) {
+      setError(t('login.unavailable'))
+    } else {
+      setError(t('login.requestFailed'))
+    }
+  }
+
+  const changeMode = (nextMode: 'login' | 'signup' | 'reset') => {
+    setMode(nextMode)
+    setError('')
+    setMessage('')
+    setFieldErrors({})
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setMessage('')
+    setFieldErrors({})
     if (mode === 'signup' && !STRONG_PASSWORD_PATTERN.test(password)) {
-      setError(`${t('login.passwordWrong')} ${locale === 'fr' ? STRONG_PASSWORD_HINT : t('login.passwordHint')}`)
+      setFieldErrors({ password: `${t('login.passwordWrong')} ${locale === 'fr' ? STRONG_PASSWORD_HINT : t('login.passwordHint')}` })
       return
     }
     setIsSubmitting(true)
@@ -54,7 +72,7 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
           redirectTo: callbackUrl.toString(),
         })
         if (resetError) {
-          setError(getAuthErrorMessage(resetError.code, resetError.message, resetError.status))
+          handleAuthError(resetError.code, resetError.message, resetError.status, false)
           return
         }
         setMessage(t('login.resetSent'))
@@ -73,7 +91,7 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
           })
 
       if (response.error) {
-        setError(getAuthErrorMessage(response.error.code, response.error.message, response.error.status))
+        handleAuthError(response.error.code, response.error.message, response.error.status, isLogin)
         return
       }
 
@@ -87,7 +105,7 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
       } else if (isLogin) {
         setError(t('login.loginFailed'))
       } else if (response.data.user?.identities?.length === 0) {
-        setError(t('login.emailExists'))
+        setFieldErrors({ email: t('login.emailExists') })
       } else {
         setMessage(t('login.signupSent'))
       }
@@ -136,13 +154,16 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
               type="email"
               id="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setFieldErrors((current) => ({ ...current, email: undefined })) }}
               autoComplete="email"
               maxLength={254}
+              aria-invalid={Boolean(fieldErrors.email)}
+              aria-describedby={fieldErrors.email ? 'email-error' : undefined}
               className="font-inter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition"
                 placeholder={locale === 'fr' ? 'toi@exemple.com' : 'you@example.com'}
               required
             />
+            {fieldErrors.email && <p id="email-error" className="mt-2 text-sm text-red-700" role="alert">{fieldErrors.email}</p>}
           </div>
 
           {mode !== 'reset' && (
@@ -154,23 +175,25 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
                 type="password"
                 id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); setFieldErrors((current) => ({ ...current, password: undefined })) }}
                 autoComplete={isLogin ? 'current-password' : 'new-password'}
                 minLength={isLogin ? undefined : 12}
                 maxLength={128}
                 pattern={isLogin ? undefined : STRONG_PASSWORD_PATTERN.source}
                 title={isLogin ? undefined : STRONG_PASSWORD_HINT}
-                aria-describedby={isLogin ? undefined : 'password-strength-help'}
+                aria-invalid={Boolean(fieldErrors.password)}
+                aria-describedby={[!isLogin ? 'password-strength-help' : '', fieldErrors.password ? 'password-error' : ''].filter(Boolean).join(' ') || undefined}
                 className="font-inter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition"
                 placeholder="••••••••"
                 required
               />
               {mode === 'signup' && <p id="password-strength-help" className="mt-2 text-xs leading-relaxed text-gray-600">{locale === 'fr' ? STRONG_PASSWORD_HINT : t('login.passwordHint')}</p>}
+              {fieldErrors.password && <p id="password-error" className="mt-2 text-sm text-red-700" role="alert">{fieldErrors.password}</p>}
             </div>
           )}
 
           {mode === 'login' && (
-            <button type="button" onClick={() => setMode('reset')} className="-mt-3 font-poppins text-sm font-semibold text-gray-700 hover:text-gray-950">
+            <button type="button" onClick={() => changeMode('reset')} className="-mt-3 font-poppins text-sm font-semibold text-gray-700 hover:text-gray-950">
               {t('login.forgot')}
             </button>
           )}
@@ -199,10 +222,10 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
         <div className="mt-6 text-center">
           {isLogin ? (
             <div className="flex flex-col gap-3">
-              <button type="button" onClick={() => setMode('signup')} className="font-poppins text-gray-700 hover:text-gray-950 font-semibold">{t('login.createQuestion')}</button>
+              <button type="button" onClick={() => changeMode('signup')} className="font-poppins text-gray-700 hover:text-gray-950 font-semibold">{t('login.createQuestion')}</button>
             </div>
           ) : (
-            <button type="button" onClick={() => setMode('login')} className="font-poppins text-gray-700 hover:text-gray-950 font-semibold">{t('login.return')}</button>
+            <button type="button" onClick={() => changeMode('login')} className="font-poppins text-gray-700 hover:text-gray-950 font-semibold">{t('login.return')}</button>
           )}
         </div>
 
