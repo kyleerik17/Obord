@@ -61,12 +61,11 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
 
     try {
       const supabase = getSupabaseBrowserClient()
-      const callbackUrl = new URL('/auth/confirm', window.location.origin)
       const requestedNext = new URLSearchParams(window.location.search).get('next')
       const hasSafeReturnPath = requestedNext?.startsWith('/') && !requestedNext.startsWith('//') && !requestedNext.includes('\\')
-      if (mode === 'signup' && hasSafeReturnPath && requestedNext) callbackUrl.searchParams.set('next', requestedNext)
 
       if (mode === 'reset') {
+        const callbackUrl = new URL('/auth/confirm', window.location.origin)
         callbackUrl.searchParams.set('next', '/login/update-password')
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
           redirectTo: callbackUrl.toString(),
@@ -84,10 +83,7 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
         : await supabase.auth.signUp({
             email: email.trim(),
             password,
-            options: {
-              emailRedirectTo: callbackUrl.toString(),
-              data: { full_name: name },
-            },
+            options: { data: { full_name: name } },
           })
 
       if (response.error) {
@@ -107,7 +103,31 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
       } else if (response.data.user?.identities?.length === 0) {
         setFieldErrors({ email: t('login.emailExists') })
       } else {
-        setMessage(t('login.signupSent'))
+        setError(t('login.signupNeedsConfig'))
+      }
+    } catch {
+      setError(t('login.unavailable'))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const signInWithProvider = async (provider: 'google' | 'apple') => {
+    setError('')
+    setFieldErrors({})
+    setIsSubmitting(true)
+    try {
+      const callbackUrl = new URL('/auth/confirm', window.location.origin)
+      const requestedNext = new URLSearchParams(window.location.search).get('next')
+      const safeNext = requestedNext?.startsWith('/') && !requestedNext.startsWith('//') && !requestedNext.includes('\\') ? requestedNext : null
+      if (safeNext) callbackUrl.searchParams.set('next', safeNext)
+      const { error: oauthError } = await getSupabaseBrowserClient().auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: callbackUrl.toString() },
+      })
+      if (oauthError) {
+        const isProviderUnavailable = /provider.*(disabled|not enabled)|unsupported provider/i.test(oauthError.message)
+        setError(isProviderUnavailable ? t('login.providerSetup') : t('login.unavailable'))
       }
     } catch {
       setError(t('login.unavailable'))
@@ -206,6 +226,20 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
             {isSubmitting ? t('common.loading') : isLogin ? t('login.submit') : mode === 'signup' ? t('login.signup') : t('login.reset')}
           </button>
         </form>
+
+        {mode !== 'reset' && <div className="login-social-section">
+          <div className="login-divider"><span>{t('login.orContinue')}</span></div>
+          <div className="login-social-buttons">
+            <button type="button" disabled={isSubmitting} onClick={() => void signInWithProvider('google')} className="login-social-button">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.09-1.92 3.27-4.75 3.27-8.1Z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.28-1.93-6.15-4.53H2.16v2.84A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M5.85 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.16a11 11 0 0 0 0 9.9l3.69-2.84Z"/><path fill="#EA4335" d="M12 5.36c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1a11 11 0 0 0-9.84 6.05l3.69 2.84C6.72 7.29 9.14 5.36 12 5.36Z"/></svg>
+              {t('login.google')}
+            </button>
+            <button type="button" disabled={isSubmitting} onClick={() => void signInWithProvider('apple')} className="login-social-button">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.1c.02 2.3 2.02 3.07 2.04 3.08-.02.05-.32 1.1-1.05 2.18-.63.94-1.28 1.88-2.31 1.9-1.01.03-1.34-.61-2.5-.61-1.15 0-1.52.59-2.47.63-.99.04-1.75-1.02-2.39-1.96-1.3-1.9-2.3-5.38-.97-7.73.66-1.17 1.85-1.91 3.14-1.93.98-.02 1.9.67 2.5.67.59 0 1.71-.83 2.88-.71.49.02 1.87.2 2.76 1.5-.07.04-1.65.96-1.63 2.98ZM14.48 5.7c.52-.63.87-1.5.77-2.37-.75.03-1.66.5-2.2 1.13-.49.56-.92 1.44-.8 2.29.84.07 1.7-.42 2.23-1.05Z"/></svg>
+              {t('login.apple')}
+            </button>
+          </div>
+        </div>}
 
         {message && (
           <p className="mt-4 rounded-lg bg-green-50 px-4 py-3 font-inter text-sm text-green-700" role="status">

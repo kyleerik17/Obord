@@ -82,6 +82,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className={`${dancingScript.variable} ${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-display" suppressHydrationWarning>
+        <div className="site-atmosphere" aria-hidden="true"><span/><span/><span/><span/></div>
         <LocaleProvider initialLocale={locale}>
           <ThemeProvider initialTheme={theme}>
             <PageTransition />

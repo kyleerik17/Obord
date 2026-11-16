@@ -304,6 +304,14 @@ html[data-theme="dark"] .meetup-explorer-hero { background: #18171d; }html[data-
 .login-page { display: grid; min-height: calc(100svh - 76px); place-items: center; padding: 48px 20px; }
 .login-card { width: min(100%, 470px); padding: clamp(24px, 5vw, 42px); border: 1px solid var(--line); border-radius: 22px; background: #fff; box-shadow: 0 20px 60px rgb(36 35 31 / 8%); }
 .login-card h1 { font-size: 36px; }
+.login-social-section { margin-top: 25px; }
+.login-divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 11px; }
+.login-divider::before, .login-divider::after { height: 1px; flex: 1; background: var(--line); content: ''; }
+.login-social-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.login-social-button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 9px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); color: var(--foreground); font-size: 13px; font-weight: 650; }
+.login-social-button:hover:not(:disabled) { border-color: #c9c3ea; background: #f7f5ff; }
+.login-social-button:disabled { cursor: wait; opacity: .6; }
+.login-social-button svg { width: 18px; height: 18px; flex: none; }
 
 /* Footer and persistent WhatsApp shortcut. */
 .site-footer { margin-top: 0; padding: 56px max(7vw, calc((100vw - 1160px) / 2)) 20px; border-top: 1px solid var(--line); background: #f1efe9; color: var(--foreground); }
@@ -578,12 +586,45 @@ html[data-theme="dark"] .login-card label,
 html[data-theme="dark"] .login-card .text-gray-700,
 html[data-theme="dark"] .login-card .text-gray-600 { color: #f1eef7 !important; }
 html[data-theme="dark"] .login-card > div > p { color: #d0cbd6 !important; }
+html[data-theme="dark"] .login-social-button:hover:not(:disabled) { border-color: #5b527f; background: #292633; }
 html[data-theme="dark"] .explorer-results-label,
 html[data-theme="dark"] .explorer-results-label span:first-child { color: #d0cbd6; }
 html[data-theme="dark"] .explorer-eyebrow { color: #bcb5ff; }
 html[data-theme="dark"] .explorer-capacity,
 html[data-theme="dark"] .explorer-card-action { color: #c4bdff; }
 html[data-theme="dark"] .explorer-empty-secondary { border-color: var(--line); background: var(--surface); color: var(--foreground); }
+
+/* A soft, moving color wash sits behind every page without tinting its text or cards. */
+body { position: relative; isolation: isolate; background: var(--background); }
+.site-atmosphere { position: fixed; z-index: -1; inset: 0; overflow: hidden; pointer-events: none; }
+.site-atmosphere > span { position: absolute; display: block; width: min(58vw, 760px); aspect-ratio: 1; border-radius: 50%; filter: blur(clamp(65px, 9vw, 135px)); opacity: .39; will-change: transform; }
+.site-atmosphere > span:nth-child(1) { top: -35%; left: -18%; background: radial-gradient(circle, #ff8b6b 0%, #ff8b6b66 34%, transparent 68%); animation: obord-atmosphere-drift-one 28s ease-in-out infinite alternate; }
+.site-atmosphere > span:nth-child(2) { top: 12%; right: -24%; background: radial-gradient(circle, #8175ed 0%, #8175ed55 38%, transparent 70%); animation: obord-atmosphere-drift-two 34s ease-in-out infinite alternate; }
+.site-atmosphere > span:nth-child(3) { bottom: -45%; left: 20%; background: radial-gradient(circle, #f6d55c 0%, #f6d55c55 34%, transparent 69%); animation: obord-atmosphere-drift-three 32s ease-in-out infinite alternate; }
+.site-atmosphere > span:nth-child(4) { top: 42%; left: 39%; width: min(42vw, 580px); background: radial-gradient(circle, #75bda0 0%, #75bda044 36%, transparent 70%); animation: obord-atmosphere-drift-two 39s ease-in-out infinite alternate-reverse; }
+body main > .editorial-home,
+body main > .meetup-explorer,
+body main > .trust-page,
+body main > .blog-page,
+body main > .blog-article-page,
+body main > .member-page,
+body main > .backoffice-page,
+body main > .login-page,
+body main > .place-page,
+body main > .organizers-page,
+body main > .soirees-page { background: transparent !important; }
+@keyframes obord-atmosphere-drift-one { to { transform: translate3d(15vw, 17vh, 0) scale(1.12); } }
+@keyframes obord-atmosphere-drift-two { to { transform: translate3d(-16vw, 12vh, 0) scale(.88); } }
+@keyframes obord-atmosphere-drift-three { to { transform: translate3d(10vw, -16vh, 0) scale(1.16); } }
+html[data-theme="dark"] .site-atmosphere > span { opacity: .24; filter: blur(clamp(70px, 10vw, 150px)) saturate(1.35); }
+html[data-theme="dark"] .site-atmosphere > span:nth-child(1) { background: radial-gradient(circle, #c35464 0%, #c354644c 36%, transparent 70%); }
+html[data-theme="dark"] .site-atmosphere > span:nth-child(2) { background: radial-gradient(circle, #6555d1 0%, #6555d155 38%, transparent 70%); }
+html[data-theme="dark"] .site-atmosphere > span:nth-child(3) { background: radial-gradient(circle, #a57a2d 0%, #a57a2d48 34%, transparent 69%); }
+html[data-theme="dark"] .site-atmosphere > span:nth-child(4) { background: radial-gradient(circle, #347b68 0%, #347b6844 36%, transparent 70%); }
+@media (min-width: 768px) { .navbar-mobile-actions { display: none !important; } }
+@media (max-width: 767px) { nav[aria-label="Navigation principale"] > div > div > div.hidden { display: none !important; } }
+@media (max-width: 600px) { .site-atmosphere > span { width: 90vw; opacity: .3; } html[data-theme="dark"] .site-atmosphere > span { opacity: .19; } }
+@media (prefers-reduced-motion: reduce) { .site-atmosphere > span { animation: none !important; } }
 
 /* More saturated cards with text contrast kept above AA targets. */
 .activity-card:nth-child(4n + 1) .activity-card-icon { background: #ffe4dc; color: #91351f; }
@@ -620,7 +661,9 @@ html[data-theme="dark"] .explorer-empty-secondary { border-color: var(--line); b
 @media (max-width: 600px) {
   .explorer-empty-actions { width: 100%; }
   .explorer-empty-actions > * { width: 100%; }
+  .login-social-buttons { grid-template-columns: 1fr; }
   .meetup-explorer-hero { background: radial-gradient(ellipse at 90% 90%, #ff7a5928, transparent 48%), radial-gradient(ellipse at 5% 3%, #f6d55c35, transparent 40%), #f1efe9; }
   html[data-theme="dark"] .meetup-explorer-hero { background: radial-gradient(ellipse at 90% 90%, #ff7a591b, transparent 48%), radial-gradient(ellipse at 5% 3%, #6255d622, transparent 40%), #19181f !important; }
 }
+
 @media (prefers-reduced-motion: reduce) { .ob-photo-slide { transition: none; transform: none; } }
