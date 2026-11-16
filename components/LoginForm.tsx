@@ -19,6 +19,18 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
   const [error, setError] = useState(authFailed ? t('login.callbackFailed') : '')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const getAuthErrorMessage = (code: string | undefined, message: string, status: number) => {
+    if (status === 429) return t('login.rateLimited')
+    if (code === 'email_not_confirmed') return t('login.emailNotConfirmed')
+    if (code === 'invalid_credentials') return t('login.badCredentials')
+    if (code === 'email_exists' || code === 'user_already_exists') return t('login.emailExists')
+    if (code === 'weak_password' || code === 'password_too_weak') return t('login.weakPassword')
+    if (code === 'signup_disabled') return t('login.signupDisabled')
+    if (code?.includes('redirect') || message.toLowerCase().includes('redirect')) return t('login.redirectNotAllowed')
+    if (status >= 500) return t('login.unavailable')
+    return t('login.requestFailed')
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -42,7 +54,7 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
           redirectTo: callbackUrl.toString(),
         })
         if (resetError) {
-          setError(t('login.requestFailed'))
+          setError(getAuthErrorMessage(resetError.code, resetError.message, resetError.status))
           return
         }
         setMessage(t('login.resetSent'))
@@ -61,15 +73,7 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
           })
 
       if (response.error) {
-        if (isLogin && response.error.code === 'email_not_confirmed') {
-          setError(t('login.emailNotConfirmed'))
-        } else if (isLogin && response.error.code === 'invalid_credentials') {
-          setError(t('login.badCredentials'))
-        } else if (response.error.status >= 500) {
-          setError(t('login.unavailable'))
-        } else {
-          setError(t('login.requestFailed'))
-        }
+        setError(getAuthErrorMessage(response.error.code, response.error.message, response.error.status))
         return
       }
 
@@ -82,6 +86,8 @@ export default function LoginForm({ initialMode, authFailed }: { initialMode: 'l
         router.refresh()
       } else if (isLogin) {
         setError(t('login.loginFailed'))
+      } else if (response.data.user?.identities?.length === 0) {
+        setError(t('login.emailExists'))
       } else {
         setMessage(t('login.signupSent'))
       }

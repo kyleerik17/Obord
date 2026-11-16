@@ -29,13 +29,9 @@ export default async function Soirees() {
 
   return <MeetupExplorer events={events} error={agenda.error} locale={locale} copy={{
     eyebrow: t('soirees.choose'), title: t('soirees.hero'), intro: t('soirees.intro'),
-    filters: t('explorer.filters'), all: t('explorer.all'), calm: t('explorer.calm'), games: t('explorer.games'), online: t('explorer.online'), spontaneous: t('explorer.spontaneous'),
-    count: t('explorer.count'), open: t('explorer.open'), join: t('explorer.join'), create: t('explorer.create'), createTitle: t('explorer.createTitle'), createIntro: t('explorer.createIntro'),
-    step: t('explorer.step'), next: t('explorer.next'), back: t('explorer.back'), publish: t('explorer.publish'), close: t('explorer.close'),
-    name: t('explorer.name'), activity: t('explorer.activity'), date: t('explorer.date'), time: t('explorer.time'), place: t('explorer.place'), description: t('explorer.description'), preview: t('explorer.preview'),
-    emptyTitle: t('explorer.emptyTitle'), emptyText: t('explorer.emptyText'), reset: t('explorer.reset'), noPhoto: t('explorer.noPhoto'), noCapacity: t('explorer.noCapacity'), remaining: t('soirees.remaining'), full: t('soirees.full'),
-    nameLabel: t('explorer.name'),
-    detail: t('soirees.selectedHelp'), venue: t('soirees.venue'), contribution: t('soirees.participation'), schedule: t('soirees.schedule'), reserve: t('soirees.reserve'), typeOuting: t('soirees.outing'), typeWorkshop: t('soirees.workshop'),
+    count: t('explorer.count'), open: t('explorer.open'), join: t('explorer.join'), close: t('explorer.close'),
+    contact: t('home.contactCta'), memories: t('home.memories'), noCapacity: t('explorer.noCapacity'), remaining: t('soirees.remaining'), full: t('soirees.full'),
+    venue: t('soirees.venue'), contribution: t('soirees.participation'), schedule: t('soirees.schedule'), typeOuting: t('soirees.outing'), typeWorkshop: t('soirees.workshop'),
     errorTitle: t('soirees.errorTitle'), errorText: t('soirees.errorText'), emptyAgendaTitle: t('soirees.emptyTitle'), emptyAgendaText: t('soirees.emptyText'),
   }} />
 }

@@ -552,6 +552,38 @@ html[data-theme="dark"] .page-transition-bloom { background: #111115; }
 .ob-photo-carousel-arrows button:hover { border-color: var(--primary); color: var(--primary); }
 .organizer-photo-carousel { width: min(100%, 890px); }
 
+/* Gentle color fields keep O'BORD warm without lowering text contrast. */
+.home-hero { background: radial-gradient(ellipse at 88% 18%, #f6d55c35, transparent 30%), radial-gradient(ellipse at 8% 95%, #ff7a5915, transparent 36%), #f4f0e9; }
+.activity-card:nth-child(4n + 3) { background: #fffbef; }
+.activity-card:nth-child(4n + 4) { background: #f8f6ff; }
+.home-reassurance { background: linear-gradient(105deg, #f1f5ef 0%, #f4f0e9 52%, #fff8f3 100%); }
+.home-story { background: linear-gradient(115deg, #f2f0eb, #eeecf8); }
+.meetup-explorer-hero { background: radial-gradient(ellipse at 88% 12%, #f6d55c3b, transparent 28%), radial-gradient(ellipse at 90% 100%, #ff7a5921, transparent 38%), linear-gradient(110deg, #f1efe9, #f4f1f8); }
+.explorer-empty-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 13px; margin-top: 8px; }
+.explorer-empty-secondary { display: inline-flex; min-height: 46px; align-items: center; padding: 0 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); color: var(--foreground); font-size: 12px; font-weight: 700; }
+.explorer-empty-secondary:hover { border-color: var(--primary); color: var(--primary); }
+.explorer-results-label { color: #56545c; }
+.ob-photo-carousel-arrows button:focus-visible,
+.ob-photo-carousel-dots button:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 60%, white); outline-offset: 3px; }
+.login-page { background: radial-gradient(ellipse at 16% 20%, #ff7a5919, transparent 32%), radial-gradient(ellipse at 88% 84%, #6255d61d, transparent 35%), var(--background); }
+html[data-theme="dark"] .home-hero,
+html[data-theme="dark"] .meetup-explorer-hero { background: radial-gradient(ellipse at 90% 14%, #796de12a, transparent 34%), radial-gradient(ellipse at 4% 100%, #ff7a5914, transparent 36%), #19181f !important; }
+html[data-theme="dark"] .home-reassurance,
+html[data-theme="dark"] .home-story { background: linear-gradient(105deg, #1d2422, #211f27 55%, #28201f) !important; }
+html[data-theme="dark"] .activity-card:nth-child(n) { border-color: var(--line); background: var(--surface); color: var(--foreground); }
+html[data-theme="dark"] .login-page { background: radial-gradient(ellipse at 14% 18%, #ff7a5919, transparent 34%), radial-gradient(ellipse at 88% 88%, #6255d61e, transparent 38%), var(--background) !important; }
+html[data-theme="dark"] .login-card h1,
+html[data-theme="dark"] .login-card label,
+html[data-theme="dark"] .login-card .text-gray-700,
+html[data-theme="dark"] .login-card .text-gray-600 { color: #f1eef7 !important; }
+html[data-theme="dark"] .login-card > div > p { color: #d0cbd6 !important; }
+html[data-theme="dark"] .explorer-results-label,
+html[data-theme="dark"] .explorer-results-label span:first-child { color: #d0cbd6; }
+html[data-theme="dark"] .explorer-eyebrow { color: #bcb5ff; }
+html[data-theme="dark"] .explorer-capacity,
+html[data-theme="dark"] .explorer-card-action { color: #c4bdff; }
+html[data-theme="dark"] .explorer-empty-secondary { border-color: var(--line); background: var(--surface); color: var(--foreground); }
+
 /* More saturated cards with text contrast kept above AA targets. */
 .activity-card:nth-child(4n + 1) .activity-card-icon { background: #ffe4dc; color: #91351f; }
 .activity-card:nth-child(4n + 2) .activity-card-icon { background: #e2eee5; color: #365b47; }
@@ -583,5 +615,11 @@ html[data-theme="dark"] .page-transition-bloom { background: #111115; }
   .site-footer-column a, .site-footer-column p { font-size: 11px !important; line-height: 1.6; overflow-wrap: anywhere; }
   .site-footer-bottom { align-items: flex-start; font-size: 10px; }
   .ob-photo-carousel-track { min-height: clamp(250px, 76vw, 420px); border-radius: 20px; }
+}
+@media (max-width: 600px) {
+  .explorer-empty-actions { width: 100%; }
+  .explorer-empty-actions > * { width: 100%; }
+  .meetup-explorer-hero { background: radial-gradient(ellipse at 90% 90%, #ff7a5928, transparent 48%), radial-gradient(ellipse at 5% 3%, #f6d55c35, transparent 40%), #f1efe9; }
+  html[data-theme="dark"] .meetup-explorer-hero { background: radial-gradient(ellipse at 90% 90%, #ff7a591b, transparent 48%), radial-gradient(ellipse at 5% 3%, #6255d622, transparent 40%), #19181f !important; }
 }
 @media (prefers-reduced-motion: reduce) { .ob-photo-slide { transition: none; transform: none; } }

@@ -13,11 +13,17 @@ function getSafeNextPath(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code')
-  if (!code) return NextResponse.redirect(new URL('/login?auth=failed', request.nextUrl.origin))
+  const tokenHash = request.nextUrl.searchParams.get('token_hash')
+  const type = request.nextUrl.searchParams.get('type')
+  const allowedTypes = ['email', 'signup', 'invite', 'magiclink', 'recovery', 'email_change'] as const
+  const otpType = allowedTypes.find((value) => value === type)
+  if (!code && (!tokenHash || !otpType)) return NextResponse.redirect(new URL('/login?auth=failed', request.nextUrl.origin))
 
   try {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { error } = code
+      ? await supabase.auth.exchangeCodeForSession(code)
+      : await supabase.auth.verifyOtp({ token_hash: tokenHash!, type: otpType! })
     if (error) return NextResponse.redirect(new URL('/login?auth=failed', request.nextUrl.origin))
 
     return NextResponse.redirect(new URL(getSafeNextPath(request), request.nextUrl.origin))
