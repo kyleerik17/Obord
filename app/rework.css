@@ -383,12 +383,12 @@ body:has(.editorial-home) .site-footer { border-color: var(--line) !important; b
 /* User controlled dark theme, shared across public pages, forms and the team area. */
 html[data-theme="dark"] {
   color-scheme: dark;
-  --background: #17161b;
-  --foreground: #f2f0f6;
-  --muted: #b4b0be;
-  --surface: #222127;
-  --line: #3a3842;
-  --shadow-soft: 0 10px 34px rgb(0 0 0 / 22%);
+  --background: #111115;
+  --foreground: #f6f4fa;
+  --muted: #c3bfcb;
+  --surface: #1b1a20;
+  --line: #393741;
+  --shadow-soft: 0 12px 38px rgb(0 0 0 / 30%);
 }
 html[data-theme="dark"] body,
 html[data-theme="dark"] .trust-page,
@@ -402,7 +402,7 @@ html[data-theme="dark"] .organizers-page,
 html[data-theme="dark"] .soirees-page,
 html[data-theme="dark"] .editorial-home { background: var(--background) !important; color: var(--foreground); }
 html[data-theme="dark"] nav[aria-label="Navigation principale"],
-html[data-theme="dark"] body:has(.editorial-home) nav[aria-label="Navigation principale"] { border-color: var(--line) !important; background: rgb(28 27 33 / 94%) !important; color: var(--foreground) !important; }
+html[data-theme="dark"] body:has(.editorial-home) nav[aria-label="Navigation principale"] { border-color: var(--line) !important; background: rgb(20 19 24 / 96%) !important; color: var(--foreground) !important; }
 html[data-theme="dark"] nav[aria-label="Navigation principale"] a,
 html[data-theme="dark"] nav[aria-label="Navigation principale"] button { color: var(--foreground) !important; }
 html[data-theme="dark"] .nav-mobile-panel { border-color: var(--line); background: #222127; }
@@ -411,7 +411,7 @@ html[data-theme="dark"] .home-reassurance,
 html[data-theme="dark"] .home-story,
 html[data-theme="dark"] .soirees-hero,
 html[data-theme="dark"] .trust-hero,
-html[data-theme="dark"] .blog-hero { background: #201f26 !important; color: var(--foreground); }
+html[data-theme="dark"] .blog-hero { background: #18171d !important; color: var(--foreground); }
 html[data-theme="dark"] .home-hero-intro,
 html[data-theme="dark"] .home-hero-location,
 html[data-theme="dark"] .home-story p,
@@ -502,5 +502,5 @@ html[data-theme="dark"] .login-card .text-green-700 { color: #9fe0b2; }
 html[data-theme="dark"] .login-card .bg-red-50 { background: #452a2c; }
 html[data-theme="dark"] .login-card .bg-green-50 { background: #20372a; }
 html[data-theme="dark"] .whatsapp-float { border-color: var(--line); background: #29272f; color: #f2f0f6; }
-html[data-theme="dark"] .page-transition-bloom { background: #17161b; }
+html[data-theme="dark"] .page-transition-bloom { background: #111115; }
 @media (prefers-reduced-motion: reduce) { .theme-toggle { transition: none; } }
