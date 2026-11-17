@@ -4,6 +4,7 @@ import { pageMetadata } from '@/lib/metadata'
 import { getPublishedBlogPosts } from '@/lib/data/blog'
 import { getLocale } from '@/lib/i18n-server'
 import { translate } from '@/lib/i18n'
+import PhotoCarousel from '@/components/PhotoCarousel'
 
 export const metadata = pageMetadata('Le blog', 'Les nouvelles, les histoires et les coulisses du collectif O’BORD à Grand-Bassam.')
 
@@ -20,6 +21,7 @@ export default async function BlogPage() {
         <p>{t('blog.intro')}</p>
       </header>
       <section className="blog-content" aria-labelledby="blog-list-title">
+        {posts.filter((post) => post.coverImageUrl).length > 1 && <PhotoCarousel className="blog-photo-carousel" label="Photos des articles O’BORD" photos={posts.filter((post) => post.coverImageUrl).map((post) => ({ src: post.coverImageUrl!, alt: `Illustration de ${post.title}` }))} />}
         <div className="blog-heading"><div><p className="event-practical-label">{t('blog.reading')}</p><h2 id="blog-list-title">{t('blog.title')}</h2></div><span>{String(posts.length).padStart(2, '0')} {t('blog.articleCount')}</span></div>
         {error ? <section className="blog-empty"><h3>{t('blog.error')}</h3><p>{t('blog.retry')}</p></section> : posts.length ? (
           <div className="blog-grid">

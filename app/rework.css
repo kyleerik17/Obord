@@ -1,13 +1,13 @@
 /* O'BORD editorial design system — a quiet, warm visual language shared by every route. */
 :root {
-  --background: #f8f7f4;
-  --foreground: #24231f;
-  --primary: #574fc7;
-  --secondary: #574fc7;
-  --accent: #574fc7;
-  --muted: #66645f;
+  --background: #faf9f6;
+  --foreground: #1e1e24;
+  --primary: #6255d6;
+  --secondary: #ff7a59;
+  --accent: #f6d55c;
+  --muted: #55545b;
   --surface: #ffffff;
-  --line: #e7e4dc;
+  --line: #eae8e3;
   --font-display: var(--font-space), sans-serif;
   --content-width: 1160px;
   --radius-card: 18px;
@@ -536,3 +536,52 @@ html[data-theme="dark"] .login-card .bg-green-50 { background: #20372a; }
 html[data-theme="dark"] .whatsapp-float { border-color: var(--line); background: #29272f; color: #f2f0f6; }
 html[data-theme="dark"] .page-transition-bloom { background: #111115; }
 @media (prefers-reduced-motion: reduce) { .theme-toggle { transition: none; } }
+
+/* Photo carousels use only images supplied by O'BORD. */
+.ob-photo-carousel { width: min(100%, 800px); margin: 22px auto 34px; }
+.ob-photo-carousel-track { position: relative; min-height: clamp(250px, 46vw, 510px); overflow: hidden; border: 1px solid var(--line); border-radius: 26px; background: #eeece5; }
+.ob-photo-slide { position: absolute; inset: 0; margin: 0; opacity: 0; transform: scale(1.025); pointer-events: none; transition: opacity .38s ease, transform .65s cubic-bezier(.2,.8,.2,1); }
+.ob-photo-slide.is-active { z-index: 1; opacity: 1; transform: scale(1); pointer-events: auto; }
+.ob-photo-slide img { object-fit: cover; }
+.ob-photo-slide figcaption { position: absolute; right: 15px; bottom: 14px; padding: 7px 10px; border: 1px solid #ffffff55; border-radius: 99px; background: #1e1e24b5; color: #fff; font-size: 10px; font-weight: 700; backdrop-filter: blur(8px); }
+.ob-photo-carousel-controls { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 12px 3px 0; }
+.ob-photo-carousel-dots, .ob-photo-carousel-arrows { display: flex; align-items: center; gap: 8px; }
+.ob-photo-carousel-dots button { width: 9px; height: 9px; padding: 0; border: 0; border-radius: 99px; background: #bdb9c9; cursor: pointer; transition: width .2s, background .2s; }
+.ob-photo-carousel-dots button[aria-current="true"] { width: 25px; background: var(--primary); }
+.ob-photo-carousel-arrows button { display: grid; width: 39px; height: 39px; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--foreground); font-size: 18px; cursor: pointer; }
+.ob-photo-carousel-arrows button:hover { border-color: var(--primary); color: var(--primary); }
+.organizer-photo-carousel { width: min(100%, 890px); }
+
+/* More saturated cards with text contrast kept above AA targets. */
+.activity-card:nth-child(4n + 1) .activity-card-icon { background: #ffe4dc; color: #91351f; }
+.activity-card:nth-child(4n + 2) .activity-card-icon { background: #e2eee5; color: #365b47; }
+.activity-card:nth-child(4n + 3) .activity-card-icon { background: #fff2bd; color: #695207; }
+.activity-card:nth-child(4n + 4) .activity-card-icon { background: #e6e2fa; color: #5144b3; }
+.activity-card:nth-child(4n + 1) { background: #fff9f6; }.activity-card:nth-child(4n + 2) { background: #f8fbf8; }
+.home-reassurance article:nth-child(1) .reassurance-number { color: #91351f; }.home-reassurance article:nth-child(2) .reassurance-number { color: #365b47; }.home-reassurance article:nth-child(3) .reassurance-number { color: #695207; }
+.editorial-button-primary { background: var(--secondary); color: #241e1b; }.editorial-button-primary:hover { background: #ee6240; }
+.editorial-button-secondary { border-color: #d4d0ec; background: #eeecfb; color: #433aa9; }
+.explorer-card:nth-child(5n + 1) .explorer-mood { background: #ffd8ce; }.explorer-card:nth-child(5n + 2) .explorer-mood { background: #d9e8dc; }.explorer-card:nth-child(5n + 3) .explorer-mood { background: #fff0ae; }.explorer-card:nth-child(5n + 4) .explorer-mood { background: #e1dcf8; }
+
+/* Footer columns shrink cleanly instead of overlapping on mobile. */
+.site-footer { width: 100%; min-width: 0; overflow: clip; }
+.site-footer-grid { grid-template-columns: minmax(0, 1.25fr) repeat(3, minmax(0, 1fr)); }
+.site-footer-grid > * { min-width: 0; }
+.site-footer-column a, .site-footer-column p { max-width: 100%; overflow-wrap: anywhere; }
+.site-footer-bottom { flex-wrap: wrap; }
+@media (max-width: 900px) {
+  .site-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 22px; }
+  .site-footer-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  .site-footer { padding: 38px 18px 18px !important; }
+  .site-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 24px 15px !important; }
+  .site-footer-grid > * { min-width: 0; }
+  .site-footer-brand { grid-column: 1 / -1 !important; }
+  .site-footer-column { gap: 8px; }
+  .site-footer-column h2 { font-size: 13px; }
+  .site-footer-column a, .site-footer-column p { font-size: 11px !important; line-height: 1.6; overflow-wrap: anywhere; }
+  .site-footer-bottom { align-items: flex-start; font-size: 10px; }
+  .ob-photo-carousel-track { min-height: clamp(250px, 76vw, 420px); border-radius: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .ob-photo-slide { transition: none; transform: none; } }

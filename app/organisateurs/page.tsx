@@ -4,6 +4,7 @@ import { organizers } from '@/lib/data/site'
 import { pageMetadata } from '@/lib/metadata'
 import { getLocale } from '@/lib/i18n-server'
 import { translate } from '@/lib/i18n'
+import PhotoCarousel from '@/components/PhotoCarousel'
 
 export const metadata = pageMetadata('Les organisateurs', 'Rencontre les organisateurs O’BORD à Grand-Bassam.')
 
@@ -17,6 +18,7 @@ export default async function Organisateurs() {
         <h1>{t('about.teamTitle')}</h1>
         <p>{t('about.teamIntro')}</p>
       </header>
+      <PhotoCarousel label={t('about.teamTitle')} className="organizer-photo-carousel" photos={organizers.flatMap((organizer) => organizer.photo ? [{ src: organizer.photo, alt: `Portrait de ${organizer.name}` }] : [])} />
       <div className="organizers-grid">
         {organizers.map((organizer) => (
           <article key={organizer.name} className="organizer-card">
